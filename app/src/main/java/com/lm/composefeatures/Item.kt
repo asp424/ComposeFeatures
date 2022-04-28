@@ -6,62 +6,62 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.*
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.motionEventSpy
+import androidx.compose.ui.graphics.Color.Companion.Black
+import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun Item(
     startAnim: Boolean,
-    i: Int,
-    offsetY: Float,
-    onLongPress: (Boolean) -> Unit,
-    omMotionEvent: (Boolean) -> Unit
+    size: Dp,
+    onMotionEvent: (Boolean) -> Unit
 ) {
-    val size = 60.dp
-    val density = LocalDensity.current.density
-    Box(Modifier
-        .width(animateDpAsState(if (startAnim) 120.dp else size).value)
-        .height(size)
-        .offset(
-            animateDpAsState(if (startAnim) size else 0.dp, tween(500)).value,
-            ((i * 150f).dp + offsetY.dp) / density
-        )
-        .padding(10.dp)
-        .background(Color.LightGray, RoundedCornerShape(10.dp))
-        .pointerInput(Unit) { detectTapGestures(onLongPress = { onLongPress(true) }) }
-        .motionEventSpy { if (it.action == 1) omMotionEvent(false) }
-    ) {
-        Text(
-            if (startAnim) i.liter else "$i",
-            modifier = Modifier.padding(
-                start = animateDpAsState(
-                    if (startAnim) 30.dp else 16.dp, tween(500)
-                ).value, top = 12.dp
-            ), maxLines = 1
-        )
+    Box(Modifier.padding(start = 10.dp, bottom = 5.dp)) {
+        Box(
+            Modifier
+                .width(animateDpAsState(if (startAnim) 120.dp else size).value)
+                .height(size)
+                .offset(
+                    animateDpAsState(if (startAnim) size else 0.dp, tween(500)).value, 0.dp
+                )
+                .background(Black, RoundedCornerShape(10.dp))
+                .pointerInput(Unit) { detectTapGestures(onLongPress = { onMotionEvent(true) }) },
+            contentAlignment = Alignment.Center
+        ) { Icon(remember { iconsList.random() }, "star", tint = White) }
     }
 }
 
-private val Int.liter
-    get() = when (this) {
-        0 -> "ноль"
-        1 -> "один"
-        2 -> "два"
-        3 -> "три"
-        4 -> "четыре"
-        5 -> "пять"
-        6 -> "шесть"
-        7 -> "семь"
-        8 -> "восемь"
-        9 -> "девять"
-        10 -> "десять"
-        else -> "хуй"
-    }
+val iconsList = listOf(
+    Icons.Outlined.Cloud,
+    Icons.Outlined.Abc,
+    Icons.Outlined.Dashboard,
+    Icons.Outlined.Wallpaper,
+    Icons.Outlined.Face,
+    Icons.Outlined.Vaccines,
+    Icons.Outlined.VerticalAlignCenter,
+    Icons.Outlined.GMobiledata,
+    Icons.Outlined.DataObject,
+    Icons.Outlined.CalendarMonth,
+    Icons.Outlined.ForwardToInbox,
+    Icons.Outlined.HdrAuto,
+    Icons.Outlined.RampLeft,
+    Icons.Outlined.Eco,
+    Icons.Outlined.Yard,
+    Icons.Outlined.Image,
+    Icons.Outlined.Balcony,
+    Icons.Outlined.NavigateBefore,
+    Icons.Outlined.VapeFree,
+    Icons.Outlined.Undo
+)
+

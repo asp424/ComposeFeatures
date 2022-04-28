@@ -1,48 +1,58 @@
 package com.lm.composefeatures
 
 import android.util.Log
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun MovingList() {
-    var offsetY by remember { mutableStateOf(-100f) }
     var isLongPressed by remember { mutableStateOf(false) }
-    MainBox(isLongPressed, { offsetY = it }, { isLongPressed = it }) {
-        repeat(20) { i ->
+    Scaffold {
+        CardBack()
+        MainColumn(isLongPressed, { isLongPressed = it }) {
+                fVIIndex, index, offsetY, size, sizeToPx ->
 
             var startAnim by remember { mutableStateOf(false) }
 
-            OnFingerEvent(offsetY, i, isLongPressed) { startAnim = it }
+            OnActionMoveEvent(offsetY + fVIIndex * sizeToPx, (index * sizeToPx), isLongPressed)
+                    { startAnim = it }
 
-            OnActionUpEvent(isLongPressed) { startAnim = it }
+            LaunchedEffect(isLongPressed) { if (!isLongPressed) startAnim = false }
 
-            Item(startAnim, i, offsetY, { startAnim = it; isLongPressed = it },
-                { isLongPressed = it })
+            Item(startAnim, size) { isLongPressed = it; startAnim = it }
         }
     }
 }
 
 val <T> T.log get() = Log.d("My", toString())
 
-private fun Float.check(i: Float) = this in i - 40..i + 80
-
 @Composable
-private fun OnActionUpEvent(isLongPressed: Boolean, startAnim: (Boolean) -> Unit) =
-    LaunchedEffect(isLongPressed) { if (!isLongPressed) startAnim(false) }
-
-
-@Composable
-private fun OnFingerEvent(
-    y: Float, i: Int, isLongPressed: Boolean, startAnim: (Boolean) -> Unit
-) = with(y.check(i * 150f)) {
-        LaunchedEffect(this) {
-            if (isLongPressed) if (this@with) startAnim(true)
-            else {
-                delay(100); startAnim(false)
+private fun OnActionMoveEvent(
+    y: Float, i: Float, isLongPressed: Boolean, startAnim: (Boolean) -> Unit
+) {
+    val d = with(LocalDensity.current){ 40.dp.toPx() }
+    (y in i .. i + d).also {
+        LaunchedEffect(it) {
+            withContext(IO) {
+                if (it && isLongPressed) startAnim(true)
+                else {
+                    delay(100); startAnim(false)
+                }
             }
         }
     }
+}
+
+
+
 
 
 
