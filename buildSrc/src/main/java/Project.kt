@@ -3,6 +3,7 @@ import org.gradle.api.artifacts.dsl.RepositoryHandler
 import org.gradle.api.initialization.dsl.ScriptHandler
 import org.gradle.api.initialization.dsl.ScriptHandler.CLASSPATH_CONFIGURATION
 import org.gradle.api.tasks.Delete
+import org.gradle.kotlin.dsl.maven
 import org.gradle.kotlin.dsl.register
 import java.io.File
 

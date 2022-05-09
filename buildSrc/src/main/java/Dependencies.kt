@@ -34,11 +34,9 @@ val gradleList = listOf(
     "com.android.tools.build:gradle:7.1.0",
     "org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.10"
 )
-const val checkUpdate = "name.remal.check-dependency-updates"
 
-val pluginsList = listOf(
-    "com.android.application", "org.jetbrains.kotlin.android", "kotlin-kapt", checkUpdate
-)
+val pluginsList = listOf("com.android.application", "org.jetbrains.kotlin.android", "kotlin-kapt"
+    )
 
 
 
