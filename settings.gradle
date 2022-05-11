@@ -10,3 +10,4 @@ include ':Web'
 
 
 include ':expandedcolumn'
+include ':fantasticprogress'

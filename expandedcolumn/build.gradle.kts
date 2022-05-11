@@ -38,6 +38,6 @@ android {
 		implementation("androidx.compose.material:material-icons-core:$composeVersion")
 		implementation("androidx.compose.material:material-icons-extended:$composeVersion")
 		implementation("androidx.compose.animation:animation:$composeVersion")
-		implementation("androidx.compose.material3:material3:1.0.0-alpha08")
+		implementation("androidx.compose.material3:material3:1.0.0-alpha11")
 		
 	}

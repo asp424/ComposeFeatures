@@ -11,5 +11,5 @@ const val res = "/META-INF/{AL2.0,LGPL2.1}"
 const val impl = "implementation"
 const val kapt = "kapt"
 val argsList = listOf("-Xjvm-default=all", "-opt-in=kotlin.RequiresOptIn")
-const val composeVersion = "1.2.0-alpha06"
+const val composeVersion = "1.2.0-beta01"
 

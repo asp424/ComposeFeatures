@@ -1,14 +1,20 @@
 plugins {
-	pluginsList.forEach { id(it) }
+	id("com.android.application")
+	id("org.jetbrains.kotlin.android")
+	id("kotlin-kapt")
 }
-dependencies { implementations() }
+dependencies {
+	implementations()
+	implementation(project(":expandedcolumn"))
+	implementation(files("libs/fantasticprogress-release.aar"))
+}
 
 android {
-	compileSdk = 31
+	compileSdk = 32
 	defaultConfig {
 		applicationId = appId
 		minSdk = 26
-		targetSdk = 31
+		targetSdk = 32
 		versionCode = 1
 		versionName = appVersion
 		testInstrumentationRunner = testRunner
@@ -26,7 +32,6 @@ android {
 		}
 		buildFeatures { compose = true }
 		packagingOptions { resources { excludes += res } }
-		
 	}
 }
 
