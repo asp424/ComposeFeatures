@@ -15,7 +15,6 @@ import com.lm.expandedcolumn.ExpandedItem
 import com.lm.fantasticprogress.CircleProgress
 import com.lm.fantasticprogress.ProgressCircleType
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun ShowProgresses() {
     var text by remember { mutableStateOf("") }
@@ -56,9 +55,9 @@ fun ShowProgresses() {
             .fillMaxSize()
             .padding(top = 40.dp)
     ) {
-        CircleProgress(type = ProgressCircleType.Atom, visible, maxSize = 3f)
-        CircleProgress(type = ProgressCircleType.Fast, visible1, maxSize = 3f)
-        CircleProgress(type = ProgressCircleType.Middle, visible2, 1f, 3f)
+        CircleProgress(visible = visible, rotationSpeed = 30, resizeSpeed = 100, minSize = 2f, maxSize = 1f,  type = ProgressCircleType.Custom)
+        CircleProgress(visible = visible1)
+        CircleProgress(visible = visible2)
         Text(text, modifier = Modifier.padding(top = 80.dp))
     }
 
@@ -71,7 +70,7 @@ fun ShowProgresses() {
             visible1 = false
             visible2 = false
             text = ""
-        }
+        }, contentPadding = 10.dp
     )
 }
 

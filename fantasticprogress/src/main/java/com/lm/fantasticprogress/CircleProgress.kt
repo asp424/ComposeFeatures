@@ -22,7 +22,9 @@ import kotlin.math.sin
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun CircleProgress(
-    type: ProgressCircleType,
+    type: ProgressCircleType = ProgressCircleType.Fast,
+    rotationSpeed: Int = 30,
+    resizeSpeed: Int = 500,
     visible: Boolean,
     minSize: Float = 0f,
     maxSize: Float = 1f
@@ -38,7 +40,7 @@ fun CircleProgress(
         if (workState) {
             jobSize?.cancel()
             jobSize = coroutine.launch(Dispatchers.IO) {
-                oneSideWaveTimer(speed = type.speed, countItems = 11) { t, s ->
+                oneSideWaveTimer(speed = if (type == ProgressCircleType.Custom) rotationSpeed else type.speed, countItems = 11) { t, s ->
                     tick = t
                     scale = s
                     rotation += 1f
@@ -52,7 +54,7 @@ fun CircleProgress(
         repeat(12) {
             val float by animateFloatAsState(
                 if (map[it]) minSize else maxSize,
-                animationSpec = tween(type.speedResize)
+                animationSpec = tween(if (type == ProgressCircleType.Custom) resizeSpeed else type.speedResize)
             )
             Canvas(modifier = Modifier
                 .graphicsLayer {
@@ -77,7 +79,7 @@ fun CircleProgress(
 }
 
 internal suspend fun oneSideWaveTimer(
-    speed: Long,
+    speed: Int,
     countItems: Int,
     call: (Int, Boolean) -> Unit
 ) {
@@ -95,7 +97,7 @@ internal suspend fun oneSideWaveTimer(
                     else -> true
                 }
             )
-        delay(speed)
+        delay(speed.toLong())
         when (side) {
             1 -> tick--
             2 -> tick--
@@ -128,15 +130,17 @@ sealed class ProgressCircleType {
     object Middle : ProgressCircleType()
     object Fast : ProgressCircleType()
     object Random : ProgressCircleType()
+    object Custom : ProgressCircleType()
 }
 
 internal val ProgressCircleType.speed get() =
     when(this){
-        is ProgressCircleType.Atom -> 3L
-        is ProgressCircleType.Slow -> 100L
-        is ProgressCircleType.Middle -> 50L
-        is ProgressCircleType.Fast -> 30L
-        is ProgressCircleType.Random -> 10L
+        is ProgressCircleType.Atom -> 3
+        is ProgressCircleType.Slow -> 100
+        is ProgressCircleType.Middle -> 50
+        is ProgressCircleType.Fast -> 30
+        is ProgressCircleType.Random -> 10
+        is ProgressCircleType.Custom -> 30
     }
 
 internal val ProgressCircleType.speedResize get() =
@@ -146,6 +150,7 @@ internal val ProgressCircleType.speedResize get() =
         is ProgressCircleType.Middle -> 500
         is ProgressCircleType.Fast -> 500
         is ProgressCircleType.Random -> 1000
+        is ProgressCircleType.Custom -> 500
     }
 
 @ExperimentalAnimationApi
