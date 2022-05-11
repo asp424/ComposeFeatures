@@ -1,13 +1,17 @@
 package com.lm.fantasticprogress
 
+import androidx.compose.animation.*
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -15,14 +19,15 @@ import kotlinx.coroutines.launch
 import kotlin.math.cos
 import kotlin.math.sin
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun CircleProgress(
     type: ProgressCircleType,
+    visible: Boolean,
     minSize: Float = 0f,
-    mazSize: Float = 1f
+    maxSize: Float = 1f
 ) {
-    val map =
-        remember { mutableStateListOf<Boolean>().apply { (-1 until 12).map { add(false) } } }
+    val map = remember { mutableStateListOf<Boolean>().apply { (-1 until 12).map { add(false) } } }
     var scale by remember { mutableStateOf(false) }
     var tick by remember { mutableStateOf(0) }
     var rotation by remember { mutableStateOf(0f) }
@@ -43,25 +48,27 @@ fun CircleProgress(
 
     }
     LaunchedEffect(tick, scale) { map[tick] = scale }
-    repeat(12) {
-        val float by animateFloatAsState(
-            if (map[it]) minSize else mazSize,
-            animationSpec = tween(type.speedResize)
-        )
-        Canvas(modifier = Modifier
-            .graphicsLayer {
-                scaleX = float
-                scaleY = float
-                rotationZ = rotation
-            }, onDraw = {
-            drawCircle(
-                color = Color.Black,
-                center = Offset(
-                    60 * cos(30 * it * 0.0174444444).toFloat(),
-                    60 * sin(30 * it * 0.0174444444).toFloat()
-                ), radius = 10f
+    Visibility(visible) {
+        repeat(12) {
+            val float by animateFloatAsState(
+                if (map[it]) minSize else maxSize,
+                animationSpec = tween(type.speedResize)
             )
-        })
+            Canvas(modifier = Modifier
+                .graphicsLayer {
+                    scaleX = float
+                    scaleY = float
+                    rotationZ = rotation
+                }, onDraw = {
+                drawCircle(
+                    color = Color.Black,
+                    center = Offset(
+                        60 * cos(30 * it * 0.0174444444).toFloat(),
+                        60 * sin(30 * it * 0.0174444444).toFloat()
+                    ), radius = 10f
+                )
+            })
+        }
     }
 
     DisposableEffect(true) {
@@ -140,3 +147,25 @@ internal val ProgressCircleType.speedResize get() =
         is ProgressCircleType.Fast -> 500
         is ProgressCircleType.Random -> 1000
     }
+
+@ExperimentalAnimationApi
+@Composable
+internal fun Visibility(visible: Boolean, content: @Composable (AnimatedVisibilityScope.() -> Unit)) {
+    val density = LocalDensity.current
+    AnimatedVisibility(
+        visible = visible,
+        enter = slideInVertically(
+
+            initialOffsetY = { with(density) { 200.dp.roundToPx() } }
+        ) + expandVertically(
+
+            expandFrom = Alignment.Bottom
+        ) + fadeIn(
+
+            initialAlpha = 0.3f
+        ),
+        exit = slideOutVertically() + shrinkVertically() + fadeOut()
+    ) {
+        content(this)
+    }
+}
