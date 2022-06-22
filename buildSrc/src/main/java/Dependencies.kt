@@ -7,7 +7,7 @@ val implList = with(composeVersion) {
         "com.squareup.retrofit2:retrofit:2.9.0",
         "com.squareup.retrofit2:converter-gson:2.9.0",
         "androidx.lifecycle:lifecycle-runtime-ktx:2.5.0-alpha05",
-        // "androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.0-alpha05",
+         "androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.0-alpha05",
         "com.google.dagger:dagger:2.42",
         "androidx.compose.ui:ui:$this",
         "androidx.compose.ui:ui-tooling:$this",

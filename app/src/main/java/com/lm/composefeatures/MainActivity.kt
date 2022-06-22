@@ -19,7 +19,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         appComponent.inject(this)
         setContent {
-            composeDependencies.MainDependencies {
+            composeDependencies.MainScreenDependencies {
                 screens.MainScreen()
             }
         }

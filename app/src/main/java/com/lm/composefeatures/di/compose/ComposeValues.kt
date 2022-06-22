@@ -1,6 +1,9 @@
 package com.lm.composefeatures.di.compose
 
-import androidx.compose.runtime.Composable
+import android.view.MotionEvent
+import androidx.compose.runtime.*
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
@@ -9,16 +12,19 @@ import javax.inject.Inject
 interface ComposeValues {
 
     @Composable
-    fun baseValues(): MainDeps
+    fun mainScreenValues(): MainDeps
 
-    class Base @Inject constructor(): ComposeValues {
+    class Base @Inject constructor() : ComposeValues {
+
         @Composable
-        override fun baseValues() =
+        override fun mainScreenValues() =
             with(LocalConfiguration.current) {
                 with(LocalDensity.current) {
                     MainDeps(
-                        screenWidthDp.dp.toPx() / 3,
-                        screenHeightDp.dp.toPx() / 3
+                        width = screenWidthDp.dp.toPx() / 10,
+                        height = screenHeightDp.dp.toPx() / 3,
+                        sinScaleX = 30,
+                        sinScaleY = 200
                     )
                 }
             }

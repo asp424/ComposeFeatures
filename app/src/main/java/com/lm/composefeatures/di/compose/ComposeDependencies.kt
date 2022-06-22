@@ -6,21 +6,18 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import javax.inject.Inject
 
 interface ComposeDependencies {
-
     @Composable
-    fun MainDependencies(content: @Composable () -> Unit)
-
+    fun MainScreenDependencies(content: @Composable () -> Unit)
     @Composable
-    fun mainDeps(): MainDeps
+    fun mainScreenDeps(): MainDeps
 
     class Base @Inject constructor(
         private val composeValues: ComposeValues
     ) : ComposeDependencies {
-
         @Composable
-        override fun MainDependencies(content: @Composable () -> Unit) {
+        override fun MainScreenDependencies(content: @Composable () -> Unit) {
             CompositionLocalProvider(
-                local provides composeValues.baseValues(), content = content
+                local provides composeValues.mainScreenValues(), content = content
             )
         }
 
@@ -29,6 +26,6 @@ interface ComposeDependencies {
         }
 
         @Composable
-        override fun mainDeps() = local.current
+        override fun mainScreenDeps() = local.current
     }
 }
