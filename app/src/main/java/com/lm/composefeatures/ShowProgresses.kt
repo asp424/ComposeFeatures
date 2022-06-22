@@ -2,75 +2,147 @@ package com.lm.composefeatures
 
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement.Top
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.sharp.Check
-import androidx.compose.material3.Text
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
+import androidx.compose.material.icons.rounded.*
+import androidx.compose.material.icons.sharp.*
+import androidx.compose.material3.Icon
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment.Companion.Center
+import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Blue
+import androidx.compose.ui.graphics.Color.Companion.Gray
+import androidx.compose.ui.graphics.Color.Companion.Green
+import androidx.compose.ui.graphics.Color.Companion.Magenta
+import androidx.compose.ui.graphics.Color.Companion.Red
+import androidx.compose.ui.graphics.Color.Companion.White
+import androidx.compose.ui.graphics.Color.Companion.Yellow
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.navigation.animation.AnimatedNavHost
+import com.google.accompanist.navigation.animation.composable
+import com.google.accompanist.navigation.animation.rememberAnimatedNavController
+import com.lm.composefeatures.animation.enterLeftToRight
+import com.lm.composefeatures.animation.exitLeftToRight
 import com.lm.expandedcolumn.ExpandedColumn
 import com.lm.expandedcolumn.ExpandedItem
-import com.lm.fantasticprogress.CircleProgress
-import com.lm.fantasticprogress.ProgressCircleType
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun ShowProgresses() {
-    var text by remember { mutableStateOf("") }
-    var visible by remember { mutableStateOf(false) }
-    var visible1 by remember { mutableStateOf(false) }
-    var visible2 by remember { mutableStateOf(false) }
+    val navController = rememberAnimatedNavController()
+
     val list = listOf(
-        ExpandedItem(
-            "Atom progress", Icons.Sharp.Check, Color.Yellow, Color.Blue, Color.Blue,
+        ExpandedItem("Dangerous", Icons.Sharp.Dangerous, Yellow, Blue, Blue,
             onExpand = {
-                visible1 = false
-                visible2 = false
-                visible = true
-                text = "Atom progress"
-                text = "Atom progress"
+                if (navController.currentDestination?.route != "Dangerous")
+                    navController.navigate("Dangerous")
+
             }),
-        ExpandedItem(
-            "Fast progress", Icons.Sharp.Check, Color.Red, Color.White, Color.White,
+        ExpandedItem("Ебасос", Icons.Sharp.Face, Red, White, White,
             onExpand = {
-                visible = false
-                visible2 = false
-                visible1 = true
-                text = "Fast progress"
+                if (navController.currentDestination?.route != "face")
+                    navController.navigate("face")
             }),
-        ExpandedItem(
-            "Middle custom progress", Icons.Sharp.Check, Color.Green, Color.Gray, Color.Gray,
+        ExpandedItem("Facebook", Icons.Sharp.Facebook, Green, Gray, Gray,
             onExpand = {
-                visible1 = false
-                visible = false
-                visible2 = true
-                text = "Middle custom progress"
+                if (navController.currentDestination?.route != "Facebook")
+                    navController.navigate("Facebook")
+            }),
+        ExpandedItem("Save", Icons.Sharp.Save, Blue, White, White,
+            onExpand = {
+                if (navController.currentDestination?.route != "Save")
+                    navController.navigate("Save")
+
+            }),
+        ExpandedItem("Label", Icons.Sharp.Label, Magenta, Blue, Blue,
+            onExpand = {
+                if (navController.currentDestination?.route != "Label")
+                    navController.navigate("Label")
+            }),
+        ExpandedItem("Hardware", Icons.Sharp.Hardware, Gray, White, White,
+            onExpand = {
+                if (navController.currentDestination?.route != "Hardware")
+                    navController.navigate("Hardware")
             })
     )
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(top = 40.dp)
-    ) {
-        CircleProgress(visible = visible, rotationSpeed = 30, resizeSpeed = 100, minSize = 2f, maxSize = 1f,  type = ProgressCircleType.Custom)
-        CircleProgress(visible = visible1)
-        CircleProgress(visible = visible2)
-        Text(text, modifier = Modifier.padding(top = 80.dp))
-    }
+    Column(modifier = Modifier.fillMaxSize().padding(top = 30.dp), Top, CenterHorizontally) {
+        AnimatedNavHost(navController = navController, startDestination = "Placeholder",
+            enterTransition = {
+                enterLeftToRight
+            }, exitTransition = {
+                exitLeftToRight
+            }
+        ) {
 
-    ExpandedColumn(
-        listItems = list, paddingBetweenItems = 10.dp, itemSize = 40.dp,
-        modifier = Modifier
-            .padding(start = 50.dp, top = 100.dp)
-            .size(400.dp), expandedItemWidth = 200.dp, onUnLongPress = {
-            visible = false
-            visible1 = false
-            visible2 = false
-            text = ""
-        }, contentPadding = 10.dp
-    )
+            composable("Dangerous") {
+                Box(Modifier.fillMaxWidth(), contentAlignment = Center) {
+                    Icon(
+                        Icons.Rounded.Dangerous, null, modifier = Modifier
+                            .size(200.dp)
+                    )
+                }
+            }
+
+            composable("face") {
+                Box(Modifier.fillMaxWidth(), contentAlignment = Center) {
+                    Icon(
+                        Icons.Rounded.Face, null, modifier = Modifier
+                            .size(200.dp)
+                    )
+                }
+            }
+            composable("Facebook") {
+                Box(Modifier.fillMaxWidth(), contentAlignment = Center) {
+                    Icon(
+                        Icons.Rounded.Facebook, null, modifier = Modifier
+                            .size(200.dp)
+                    )
+                }
+            }
+
+            composable("Save") {
+                Box(Modifier.fillMaxWidth(), contentAlignment = Center) {
+                    Icon(
+                        Icons.Rounded.Save, null, modifier = Modifier
+                            .size(200.dp)
+                    )
+                }
+            }
+            composable("Label") {
+                Box(Modifier.fillMaxWidth(), contentAlignment = Center) {
+                    Icon(
+                        Icons.Rounded.Label, null, modifier = Modifier
+                            .size(200.dp)
+                    )
+                }
+            }
+            composable("Hardware") {
+                Box(Modifier.fillMaxWidth(), contentAlignment = Center) {
+                    Icon(
+                        Icons.Rounded.Hardware, null, modifier = Modifier
+                            .size(200.dp)
+                    )
+                }
+            }
+
+            composable("Placeholder") {
+                Box(Modifier.fillMaxWidth(), contentAlignment = Center) {
+                    Icon(
+                        Icons.Rounded.PhotoAlbum, null, modifier = Modifier
+                            .size(200.dp)
+                    )
+                }
+            }
+        }
+        ExpandedColumn(
+            listItems = list, paddingBetweenItems = 10.dp, itemSize = 40.dp, modifier = Modifier
+                .padding(top = 50.dp, start = 40.dp)
+                .height(400.dp).fillMaxWidth(), expandedItemWidth = 120.dp, onUnLongPress = {
+                navController.navigate("Placeholder")
+            }, contentPadding = 5.dp
+        )
+    }
 }
+
 

@@ -68,8 +68,7 @@ fun ExpandedColumn(
                         itemsIndexed(listItems) { i, item ->
                             remember { mutableStateOf(false) }.apply {
                                 checkForOverlap(offsetY, i, sizePx, isLongPressed) {
-                                    value = it; if (it) item.onExpand.invoke()
-                                else item.onUnExpand.invoke()
+                                    value = it
                                 }
 
                                 LaunchedEffect(isLongPressed) {

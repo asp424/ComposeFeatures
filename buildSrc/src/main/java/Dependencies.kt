@@ -8,7 +8,7 @@ val implList = with(composeVersion) {
         "com.squareup.retrofit2:converter-gson:2.9.0",
         "androidx.lifecycle:lifecycle-runtime-ktx:2.5.0-alpha05",
         // "androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.0-alpha05",
-        "com.google.dagger:dagger:2.41",
+        "com.google.dagger:dagger:2.42",
         "androidx.compose.ui:ui:$this",
         "androidx.compose.ui:ui-tooling:$this",
         "androidx.compose.compiler:compiler:$this",
@@ -29,7 +29,7 @@ val implList = with(composeVersion) {
 }
 
 val kaptList = listOf(
-    "com.google.dagger:dagger-compiler:2.41",
+    "com.google.dagger:dagger-compiler:2.42",
     //"androidx.room:room-compiler:2.4.2"
 )
 val gradleList = listOf(
