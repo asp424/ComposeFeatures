@@ -93,6 +93,21 @@ interface MainScreenHandler {
                                             sinScaleX).circle(width, sinScaleX, height)
                             }
                         )
+
+            }
+            LaunchedEffect(sinScaleX){
+                if (eventOffset.x in listPoints.first().x..listPoints.last().x) {
+                    onCheck(
+                        when (figure) {
+                            Figures.SINUS ->
+                                ((eventOffset.x - width) /
+                                        sinScaleX).sinus(width, sinScaleX, height, sinScaleY)
+                            Figures.CIRCLE ->
+                                ((eventOffset.x - width) /
+                                        sinScaleX).circle(width, sinScaleX, height)
+                        }
+                    )
+                }
             }
         }
 
