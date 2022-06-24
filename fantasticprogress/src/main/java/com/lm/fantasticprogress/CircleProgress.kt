@@ -54,7 +54,8 @@ fun CircleProgress(
         repeat(12) {
             val float by animateFloatAsState(
                 if (map[it]) minSize else maxSize,
-                animationSpec = tween(if (type == ProgressCircleType.Custom) resizeSpeed else type.speedResize)
+                animationSpec = tween(if (type == ProgressCircleType.Custom)
+                    resizeSpeed else type.speedResize)
             )
             Canvas(modifier = Modifier
                 .graphicsLayer {

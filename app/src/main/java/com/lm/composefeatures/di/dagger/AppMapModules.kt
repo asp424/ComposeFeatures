@@ -12,7 +12,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
         ScreensModule::class,
         ViewModelsModule::class,
         ComposeDependenciesModule::class,
-        ComposeValuesModule::class
+        ComposeValuesModule::class,
+        MoveBallModule::class
     ]
 )
 interface AppMapModules
