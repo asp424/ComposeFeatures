@@ -187,7 +187,7 @@ interface MainScreenHandler {
         private fun Offset.check(eventOffset: Offset, radius: Float) =
             with(eventOffset) {
                 x in this@check.x - radius..this@check.x + radius
-                        && this@check.y in y - radius..this@check.y + radius
+                        && y in this@check.y - radius..this@check.y + radius
             }
 
         @Composable
