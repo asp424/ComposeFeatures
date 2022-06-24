@@ -15,7 +15,7 @@ interface MoveBall {
 
     @Composable
     fun AutoMoveBallByTimer(
-        listPoints: SnapshotStateList<Rect>, start: Boolean,
+        listPoints: SnapshotStateList<Float>, start: Boolean,
         onTick: (Float) -> Unit,
         onEnd: () -> Unit
     )
@@ -24,7 +24,7 @@ interface MoveBall {
 
         @Composable
         override fun AutoMoveBallByTimer(
-            listPoints: SnapshotStateList<Rect>,
+            listPoints: SnapshotStateList<Float>,
             start: Boolean,
             onTick: (Float) -> Unit,
             onEnd: () -> Unit
@@ -36,12 +36,12 @@ interface MoveBall {
             }
         }
 
-        private suspend fun SnapshotStateList<Rect>.timer(
+        private suspend fun SnapshotStateList<Float>.timer(
             onTick: (Float) -> Unit,
             onEnd: () -> Unit
         ) =
             (0 until size).asFlow().onEach { if (it != 0) delay(1L) }.collect {
-                onTick(get(it).center.x)
+                onTick(get(it))
                 if (it == size - 1) onEnd()
             }
     }
