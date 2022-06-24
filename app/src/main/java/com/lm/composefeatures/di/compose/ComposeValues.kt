@@ -18,7 +18,7 @@ interface ComposeValues {
             with(LocalConfiguration.current) {
                 with(LocalDensity.current) {
                     MainDeps(
-                        width = screenWidthDp.dp.toPx() / 10,
+                        width = 80f,
                         height = screenHeightDp.dp.toPx() / 3
                     )
                 }

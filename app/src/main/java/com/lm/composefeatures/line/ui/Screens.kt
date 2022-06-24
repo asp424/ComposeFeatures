@@ -1,6 +1,5 @@
 package com.lm.composefeatures.line.ui
 
-import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.Center
 import androidx.compose.material.icons.Icons
@@ -13,11 +12,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
-import com.lm.composefeatures.di.compose.ComposeDependencies
+import com.lm.composefeatures.line.ui.main_screen.Figures
 import com.lm.composefeatures.line.ui.main_screen.MainScreenHandler
 import javax.inject.Inject
 
@@ -28,97 +25,80 @@ interface Screens {
 
     class Base @Inject constructor(
         private val mainScreenHandler: MainScreenHandler,
-        private val viewModels: ViewModels,
-        private val composeDependencies: ComposeDependencies
+        private val viewModels: ViewModels
     ) : Screens {
 
         @Composable
         override fun MainScreen() {
-            var ballX by remember { mutableStateOf(0f) }
-            var sinScaleX by remember { mutableStateOf(30f) }
-            var sinScaleY by remember { mutableStateOf(200f) }
-            var eventX by remember { mutableStateOf(0f) }
-            var eventY by remember { mutableStateOf(0f) }
+            var offset by remember { mutableStateOf(Offset.Zero) }
+            var sinScaleX by remember { mutableStateOf(90f) }
+            var sinScaleY by remember { mutableStateOf(20f) }
+            var eventOffset by remember { mutableStateOf(Offset.Zero) }
             val radius by remember { mutableStateOf(50f) }
-            val listPoints = remember { mutableStateListOf<Float>() }
+            val listPoints = remember { mutableStateListOf<Offset>() }
             val distance by remember { mutableStateOf(10f) }
             var action by remember { mutableStateOf(-1) }
             var startMove by remember { mutableStateOf(false) }
             var buttonText by remember { mutableStateOf("Go") }
-            composeDependencies.mainScreenDeps().apply {
-                with(mainScreenHandler) {
+            val figure by remember { mutableStateOf(Figures.SINUS) }
+            with(mainScreenHandler) {
 
-                    InitListPoints(
-                        listPoints,
-                        onAddFloat = { ballX = it }) {}
+                InitListPoints(listPoints, sinScaleX, sinScaleY, figure, onAddFloat = {
+                    offset = it
+                }) {}
 
-                    BoxWithCanvas(
-                        listPoints,
-                        radius,
-                        ballX,
-                        sinScaleX,
-                        sinScaleY,
-                        width,
-                        height,
-                        onEvent = { mAction, mX, mY ->
-                            action = mAction; eventX = mX; eventY = mY
-                        }
+                BoxWithCanvas(
+                    listPoints, sinScaleX, sinScaleY, figure, offset, radius, onEvent =
+                    { mAction, off ->
+                        action = mAction
+                        eventOffset = off
+                    }
+                )
+
+                CheckForStrike(
+                    listPoints, radius, eventOffset, offset, sinScaleX, sinScaleY, distance, figure
+                ) { offset = it }
+
+
+                AutoMoveBall(listPoints, startMove, onTick = { offset = it })
+                { startMove = false; buttonText = "Go" }
+
+                Column(
+                    Modifier
+                        .fillMaxSize()
+                        .padding(top = 200.dp, start = 40.dp, end = 40.dp),
+                    verticalArrangement = Center,
+                    horizontalAlignment = CenterHorizontally
+                ) {
+
+                    Slider(
+                        value = sinScaleY,
+                        onValueChange = {
+                            sinScaleY = it
+                        },
+                        valueRange = (0f..100f),
+                        modifier = Modifier
+                    )
+                    Slider(
+                        value = sinScaleX, onValueChange = {
+                            sinScaleX = it
+                        }, valueRange = (0f..90f), modifier = Modifier
                     )
 
-                    CheckForStrike(
-                        action,
-                        listPoints,
-                        radius,
-                        eventX,
-                        eventY,
-                        ballX,
-                        sinScaleX,
-                        sinScaleY,
-                        width,
-                        height,
-                        distance
-                    ) { ballX = it }
-
-                    AutoMoveBall(listPoints, startMove, onTick = { ballX = it })
-                    { startMove = false; buttonText = "Go" }
-
-                    Column(
-                        Modifier
-                            .fillMaxSize().padding(top = 100.dp)
-                            , verticalArrangement = Center,
-                        horizontalAlignment = CenterHorizontally
-                    ) {
-
-                            Slider(
-                                value = sinScaleY,
-                                onValueChange = {
-                                    sinScaleY = it
-                                },
-                                valueRange = (0f..300f),
-                                modifier = Modifier
-                            )
-                            Slider(
-                                value = sinScaleX, onValueChange = {
-                                    sinScaleX = it
-                                }, valueRange = (0f..50f), modifier = Modifier
-
-                            )
-
-                        Button(onClick = {
-                            startMove = true
-                            buttonText = "Stop"
-                        }) {
-                            Text(text = buttonText)
-                        }
+                    Button(onClick = {
+                        startMove = true
+                        buttonText = "Stop"
+                    }) {
+                        Text(text = buttonText)
                     }
-                    Column(Modifier.fillMaxSize().padding(top = 30.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Top
-                    ) {
-                        Icon(
-                            Icons.Default.Abc, null,
-                            modifier = Modifier.size(ballX.dp * 10))
-                    }
+                }
+                Column(Modifier.fillMaxSize().padding(top = 30.dp),
+                    horizontalAlignment = CenterHorizontally,
+                    verticalArrangement = Arrangement.Top
+                ) {
+                    Icon(
+                        Icons.Default.Abc, null,
+                        modifier = Modifier.size(offset.x.dp / 5))
                 }
             }
         }

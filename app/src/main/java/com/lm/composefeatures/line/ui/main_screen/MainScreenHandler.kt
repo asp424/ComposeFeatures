@@ -1,70 +1,65 @@
 package com.lm.composefeatures.line.ui.main_screen
 
-import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Black
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.input.pointer.motionEventSpy
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.dp
 import com.lm.composefeatures.di.compose.ComposeDependencies
-import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import kotlin.math.cos
 import kotlin.math.sin
 
 interface MainScreenHandler {
 
-    fun Float.sinus(width: Float, sinScaleX: Float, height: Float, sinScaleY: Float): Offset
-
     @Composable
     fun InitListPoints(
-        listPoints: SnapshotStateList<Float>,
-        onAddFloat: (Float) -> Unit, onInit: () -> Unit
+        listPoints: SnapshotStateList<Offset>,
+        sinScaleX: Float,
+        sinScaleY: Float,
+        figure: Figures,
+        onAddFloat: (Offset) -> Unit, onInit: () -> Unit
     )
 
     @Composable
-    fun DrawCanvas(
-        listPoints: SnapshotStateList<Float>,
-        radius: Float,
-        ballX: Float,
-        sinScaleX: Float,
-        sinScaleY: Float,
-        width: Float,
-        height: Float
+    fun DrawFigure(
+        listPoints: SnapshotStateList<Offset>,
+        offset: Offset,
+        radius: Float
     )
 
     @Composable
     fun CheckForStrike(
-        action: Int, listPoints: SnapshotStateList<Float>,
-        radius: Float, eventX: Float, eventY: Float, ballX: Float, sinScaleX: Float,
-        sinScaleY: Float, width: Float, height: Float, distance: Float, onCheck: (Float) -> Unit
+        listPoints: SnapshotStateList<Offset>,
+        radius: Float,
+        eventOffset: Offset,
+        offset: Offset,
+        sinScaleX: Float,
+        sinScaleY: Float, distance: Float, figure: Figures,
+        onCheck: (Offset) -> Unit
     )
 
     @Composable
     fun BoxWithCanvas(
-        listPoints: SnapshotStateList<Float>,
-        radius: Float,
-        ball: Float,
+        listPoints: SnapshotStateList<Offset>,
         sinScaleX: Float,
         sinScaleY: Float,
-        width: Float,
-        height: Float,
-        onEvent: (Int, Float, Float) -> Unit
+        figure: Figures,
+        offset: Offset,
+        radius: Float,
+        onEvent: (Int, Offset) -> Unit
     )
 
     @Composable
     fun AutoMoveBall(
-        listPoints: SnapshotStateList<Float>, start: Boolean, onTick: (Float) -> Unit,
+        listPoints: SnapshotStateList<Offset>, start: Boolean, onTick: (Offset) -> Unit,
         onEnd: () -> Unit
     )
 
@@ -75,117 +70,116 @@ interface MainScreenHandler {
 
         @Composable
         override fun CheckForStrike(
-            action: Int, listPoints: SnapshotStateList<Float>,
-            radius: Float, eventX: Float, eventY: Float, ballX: Float, sinScaleX: Float,
-            sinScaleY: Float, width: Float, height: Float, distance: Float, onCheck: (Float) -> Unit
-        ) = LaunchedEffect(eventX) {
-            withContext(IO) {
-                if (
-                    check(ballX, width, eventX, eventY,
-                        radius + distance, height, action, sinScaleX, sinScaleY)
-                ) {
-                    ((eventX - width) / sinScaleX).apply {
-                        if (this in listPoints.first()..listPoints.last()
-                        ) onCheck(this)
-
-                    }
-                }
+            listPoints: SnapshotStateList<Offset>,
+            radius: Float,
+            eventOffset: Offset,
+            offset: Offset,
+            sinScaleX: Float,
+            sinScaleY: Float,
+            distance: Float,
+            figure: Figures,
+            onCheck: (Offset) -> Unit
+        ) = with(composeDependencies.mainScreenDeps()) {
+            LaunchedEffect(eventOffset) {
+                if (offset.check(eventOffset, radius + distance))
+                    if (eventOffset.x in listPoints.first().x..listPoints.last().x)
+                        onCheck(
+                            when (figure) {
+                                Figures.SINUS ->
+                                    ((eventOffset.x - width) /
+                                            sinScaleX).sinus(width, sinScaleX, height, sinScaleY)
+                                Figures.CIRCLE ->
+                                    ((eventOffset.x - width) /
+                                            sinScaleX).circle(width, sinScaleX, height)
+                            }
+                        )
             }
         }
-
-        private fun check(
-            ballX: Float, width: Float, eventX: Float, eventY: Float, radius: Float,
-            height: Float, action: Int, sinScaleX: Float, sinScaleY: Float
-        ) = if (action == 0 || action == 2) eventX in ballX.xSin(width, sinScaleX) - radius..ballX.xSin(
-            width,
-            sinScaleX
-        ) + radius &&
-                eventY in ballX.ySin(height, sinScaleY) - radius..ballX.ySin(height, sinScaleY) + radius
-        else false
 
         @OptIn(ExperimentalComposeUiApi::class)
         @Composable
         override fun BoxWithCanvas(
-            listPoints: SnapshotStateList<Float>,
-            radius: Float,
-            ball: Float,
+            listPoints: SnapshotStateList<Offset>,
             sinScaleX: Float,
             sinScaleY: Float,
-            width: Float,
-            height: Float,
-            onEvent: (Int, Float, Float) -> Unit
+            figure: Figures,
+            offset: Offset,
+            radius: Float,
+            onEvent: (Int, Offset) -> Unit
         ) = Box(modifier = Modifier
             .fillMaxSize()
-            .motionEventSpy {
-                onEvent(it.action, it.x - radius / 2, it.y - radius / 2)
-                Log.d(
-                    "My",
-                    listPoints
-                        .indexOf(it.x)
-                        .toString()
-                )
-
-            }) {
-            DrawCanvas(
-                listPoints, radius, ball, sinScaleX, sinScaleY, width, height
-            )
+            .motionEventSpy { onEvent(it.action, Offset(it.x, it.y)) }
+        ) {
+            DrawFigure(listPoints, offset, radius)
         }
 
         @Composable
-        override fun DrawCanvas(
-            listPoints: SnapshotStateList<Float>,
-            radius: Float,
-            ballX: Float,
-            sinScaleX: Float,
-            sinScaleY: Float,
-            width: Float,
-            height: Float
-        ) =
-            Canvas(Modifier) {
-                listPoints.forEach {
-                    drawCircle(
-                        radius = 10f,
-                        center = it.sinus(width, sinScaleX, height, sinScaleY),
-                        color = Color.Black
-                    )
-                }
-                drawCircle(
-                    radius = radius,
-                    center = ballX.sinus(width, sinScaleX, height, sinScaleY),
-                    color = Color.Black
-                )
-            }
+        override fun DrawFigure(
+            listPoints: SnapshotStateList<Offset>,
+            offset: Offset,
+            radius: Float
+        ) = Canvas(Modifier) {
+            listPoints.forEach { draw(it, 10f) }
+            draw(offset, radius)
+        }
+
+        private fun DrawScope.draw(
+            offset: Offset,
+            radius: Float
+        ) = drawCircle(Black, radius, offset)
 
         @Composable
         override fun InitListPoints(
-            listPoints: SnapshotStateList<Float>,
-            onAddFloat: (Float) -> Unit, onInit: () -> Unit
+            listPoints: SnapshotStateList<Offset>,
+            sinScaleX: Float,
+            sinScaleY: Float,
+            figure: Figures,
+            onAddFloat: (Offset) -> Unit, onInit: () -> Unit
         ) {
-            listPoints.apply {
-                LaunchedEffect(true) {
-                    (0..3000).onEach {
-                        (it * 0.01f).also { k ->
-                            onAddFloat(k)
-                            add(k)
-                            if (it == 3000) onInit()
+            composeDependencies.mainScreenDeps().apply {
+                listPoints.apply {
+                    LaunchedEffect(sinScaleX, sinScaleY) {
+                        clear()
+                        (0..1000).onEach {
+                            (it * 0.01f).also { k ->
+                                when (figure) {
+                                    Figures.SINUS -> k.sinus(width, sinScaleX, height, sinScaleY)
+                                    Figures.CIRCLE -> k.circle(width, sinScaleX, height)
+                                }.apply {
+                                    add(this)
+                                }
+                                if (it == 300) onInit()
+                            }
                         }
+                    }
+                    LaunchedEffect(true){
+                        onAddFloat(get(0))
                     }
                 }
             }
         }
 
-        override fun Float.sinus(width: Float, sinScaleX: Float, height: Float, sinScaleY: Float) =
-            Offset(xSin(width, sinScaleX), ySin(height, sinScaleY))
+        private fun Float.sinus(
+            width: Float,
+            sinScaleX: Float,
+            height: Float,
+            sinScaleY: Float
+        ) = Offset(this * sinScaleX + width, sinScaleY * sin(this) + height)
 
-        private fun Float.xSin(width: Float, sinScaleX: Float) = this * sinScaleX + width
+        private fun Float.circle(width: Float, sinScaleX: Float, height: Float) =
+            Offset(sinScaleX * sin(this) + width, sinScaleX * cos(this) + height)
 
-        private fun Float.ySin(height: Float, sinScaleY: Float) = sinScaleY * sin(this) + height
+        private fun Offset.check(eventOffset: Offset, radius: Float) =
+            with(eventOffset) {
+                x in this@check.x - radius..this@check.x + radius
+                        && this@check.y in y - radius..this@check.y + radius
+            }
 
         @Composable
         override fun AutoMoveBall(
-            listPoints: SnapshotStateList<Float>,
+            listPoints: SnapshotStateList<Offset>,
             start: Boolean,
-            onTick: (Float) -> Unit,
+            onTick: (Offset) -> Unit,
             onEnd: () -> Unit
         ) = autoMoveBall.AutoMoveBallByTimer(listPoints, start, onTick = { onTick(it) })
         { onEnd() }

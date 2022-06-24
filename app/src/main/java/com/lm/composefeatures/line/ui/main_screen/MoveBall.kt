@@ -3,6 +3,7 @@ package com.lm.composefeatures.line.ui.main_screen
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.delay
@@ -15,8 +16,8 @@ interface MoveBall {
 
     @Composable
     fun AutoMoveBallByTimer(
-        listPoints: SnapshotStateList<Float>, start: Boolean,
-        onTick: (Float) -> Unit,
+        listPoints: SnapshotStateList<Offset>, start: Boolean,
+        onTick: (Offset) -> Unit,
         onEnd: () -> Unit
     )
 
@@ -24,9 +25,9 @@ interface MoveBall {
 
         @Composable
         override fun AutoMoveBallByTimer(
-            listPoints: SnapshotStateList<Float>,
+            listPoints: SnapshotStateList<Offset>,
             start: Boolean,
-            onTick: (Float) -> Unit,
+            onTick: (Offset) -> Unit,
             onEnd: () -> Unit
         ) {
             LaunchedEffect(start) {
@@ -36,8 +37,8 @@ interface MoveBall {
             }
         }
 
-        private suspend fun SnapshotStateList<Float>.timer(
-            onTick: (Float) -> Unit,
+        private suspend fun SnapshotStateList<Offset>.timer(
+            onTick: (Offset) -> Unit,
             onEnd: () -> Unit
         ) =
             (0 until size).asFlow().onEach { if (it != 0) delay(1L) }.collect {

@@ -8,6 +8,7 @@ import javax.inject.Inject
 interface ComposeDependencies {
     @Composable
     fun MainScreenDependencies(content: @Composable () -> Unit)
+
     @Composable
     fun mainScreenDeps(): MainDeps
 
