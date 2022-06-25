@@ -3,7 +3,7 @@ package com.lm.composefeatures.di.compose
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.staticCompositionLocalOf
-import com.lm.composefeatures.custom_slider.Figures
+import com.lm.composefeatures.ui.custom_slider.Figures
 import javax.inject.Inject
 
 interface ComposeDependencies {

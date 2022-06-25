@@ -1,4 +1,4 @@
-package com.lm.composefeatures.custom_slider
+package com.lm.composefeatures.ui.custom_slider
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons

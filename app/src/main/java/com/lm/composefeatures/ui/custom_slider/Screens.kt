@@ -1,7 +1,6 @@
-package com.lm.composefeatures.ui
+package com.lm.composefeatures.ui.custom_slider
 
 import androidx.compose.runtime.Composable
-import com.lm.composefeatures.custom_slider.MainScreenHandler
 import javax.inject.Inject
 
 interface Screens {

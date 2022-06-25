@@ -1,6 +1,6 @@
 package com.lm.composefeatures.di.dagger.modules
 
-import com.lm.composefeatures.ui.Screens
+import com.lm.composefeatures.ui.custom_slider.Screens
 import dagger.Binds
 import dagger.Module
 import javax.inject.Singleton

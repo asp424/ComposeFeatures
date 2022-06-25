@@ -8,7 +8,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
-import com.lm.composefeatures.custom_slider.Figures
+import com.lm.composefeatures.ui.custom_slider.Figures
 import javax.inject.Inject
 
 interface ComposeValues {

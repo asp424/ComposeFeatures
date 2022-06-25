@@ -4,7 +4,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.geometry.Offset
-import com.lm.composefeatures.custom_slider.Figures
+import com.lm.composefeatures.ui.custom_slider.Figures
 
 data class MainDeps(
     val width: Float,
