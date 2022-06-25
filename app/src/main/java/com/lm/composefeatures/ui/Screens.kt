@@ -1,38 +1,26 @@
 package com.lm.composefeatures.ui
 
-import androidx.compose.material3.Text
-import androidx.compose.runtime.*
-import androidx.compose.ui.geometry.Offset
-import com.lm.composefeatures.custom_slider.Figures
+import androidx.compose.runtime.Composable
 import com.lm.composefeatures.custom_slider.MainScreenHandler
-import com.lm.composefeatures.di.compose.ComposeDependencies
-import com.lm.composefeatures.presentation.ViewModels
-import kotlinx.coroutines.delay
 import javax.inject.Inject
 
 interface Screens {
 
     @Composable
-    fun CustomSlider(radius: Float, distance: Float, figure: Figures)
+    fun CustomSlider()
 
     class Base @Inject constructor(
         private val mainScreenHandler: MainScreenHandler
     ) : Screens {
 
         @Composable
-        override fun CustomSlider(radius: Float, distance: Float, figure: Figures) {
-
+        override fun CustomSlider() {
             with(mainScreenHandler) {
-
-                    InitListPoints(figure)
-
-                    BoxWithCanvas(figure, radius)
-
-                    CheckForStrike(radius, distance, figure)
-
-                    AutoMoveBall()
-
-                    Debug()
+                InitListPoints()
+                BoxWithCanvas()
+                CheckForStrike()
+                AutoMoveBall()
+                Debug()
             }
         }
     }

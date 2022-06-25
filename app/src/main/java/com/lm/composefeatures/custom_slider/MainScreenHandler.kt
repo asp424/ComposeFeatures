@@ -13,24 +13,23 @@ import androidx.compose.ui.input.pointer.motionEventSpy
 import androidx.compose.ui.input.pointer.pointerInput
 import com.lm.composefeatures.di.compose.ComposeDependencies
 import javax.inject.Inject
-import kotlin.math.sin
 
 interface MainScreenHandler {
 
     @Composable
-    fun InitListPoints(figure: Figures)
+    fun InitListPoints()
 
     @Composable
-    fun DrawFigure(radius: Float)
+    fun DrawFigure()
 
     @Composable
-    fun DrawBall(radius: Float)
+    fun DrawBall()
 
     @Composable
-    fun CheckForStrike(radius: Float, distance: Float, figure: Figures)
+    fun CheckForStrike()
 
     @Composable
-    fun BoxWithCanvas(figure: Figures, radius: Float)
+    fun BoxWithCanvas()
 
     @Composable
     fun AutoMoveBall()
@@ -46,44 +45,42 @@ interface MainScreenHandler {
     ) : MainScreenHandler {
 
         @Composable
-        override fun CheckForStrike(radius: Float, distance: Float, figure: Figures) =
+        override fun CheckForStrike() =
             with(composeDependencies.mainScreenDepsLocal()) {
                 with(handlerUtils) {
-                    if (strike) CheckInListAndGetSinusByEventX(figure)
-                    if (!CompareOffsets(radius + distance) || action == 1)
+                    if (strike) CheckInListAndGetSinusByEventX()
+                    if (!CompareOffsets() || action == 1)
                         false.setStrike
                 }
             }
 
         @OptIn(ExperimentalComposeUiApi::class)
         @Composable
-        override fun BoxWithCanvas(figure: Figures, radius: Float) =
+        override fun BoxWithCanvas() =
             composeDependencies.MainScreenDeps {
                 Box(modifier = Modifier
                     .fillMaxSize()
                     .motionEventSpy { it.action.setAction; Offset(it.x, it.y).setEventOffset }
                 ) {
-                    DrawFigure(radius)
+                    DrawFigure()
                 }
             }
 
         @Composable
-        override fun DrawFigure(radius: Float) =
+        override fun DrawFigure() =
             composeDependencies.MainScreenDeps {
                 Canvas(Modifier) {
-                    listPoints.forEach {
-                        handlerUtils.apply { draw(10f, it) }
-                    }
+                    listPoints.forEach { handlerUtils.apply { draw(10f, it) } }
                 }
-                DrawBall(radius)
+                DrawBall()
             }
 
         @Composable
-        override fun DrawBall(radius: Float) = with(handlerUtils) {
+        override fun DrawBall() = with(handlerUtils) {
             composeDependencies.MainScreenDeps {
                 Box(
                     Modifier
-                        .boxMod(radius)
+                        .boxMod()
                         .pointerInput(Unit) {
                             detectTapGestures(onPress = { true.setStrike })
                         }
@@ -92,16 +89,18 @@ interface MainScreenHandler {
         }
 
         @Composable
-        override fun InitListPoints(figure: Figures) {
+        override fun InitListPoints() {
             with(composeDependencies.mainScreenDepsLocal()) {
                 LaunchedEffect(scaleX, scaleY) {
-                    listPoints.clear()
-                    (0..1000).onEach {
-                        (it * 0.01f).apply {
-                            listPoints.add(
-                                Offset(this * scaleX + width, scaleY * sin(this) + height)
-                                    .apply { setOffset }
-                            )
+                    with(listPoints) {
+                        clear()
+                        handlerUtils.apply {
+                            (0..figureLength).onEach {
+                                add(
+                                    it.sinusOffset(scaleX, scaleY, width, height)
+                                        .apply { setOffset }
+                                )
+                            }
                         }
                     }
                 }

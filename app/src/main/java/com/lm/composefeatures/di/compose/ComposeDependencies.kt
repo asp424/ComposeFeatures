@@ -3,6 +3,7 @@ package com.lm.composefeatures.di.compose
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.staticCompositionLocalOf
+import com.lm.composefeatures.custom_slider.Figures
 import javax.inject.Inject
 
 interface ComposeDependencies {
@@ -10,7 +11,10 @@ interface ComposeDependencies {
     fun mainScreenDepsLocal(): MainDeps
 
     @Composable
-    fun MainScreenDependencies(content: @Composable () -> Unit)
+    fun MainScreenDependencies(
+        figure: Figures, radius: Float, figureLength: Int, distance: Float,
+        content: @Composable () -> Unit
+    )
 
     @Composable
     fun MainScreenDeps(loc: @Composable MainDeps.() -> Unit)
@@ -19,9 +23,13 @@ interface ComposeDependencies {
         private val composeValues: ComposeValues
     ) : ComposeDependencies {
         @Composable
-        override fun MainScreenDependencies(content: @Composable () -> Unit) {
+        override fun MainScreenDependencies(
+            figure: Figures, radius: Float, figureLength: Int, distance: Float,
+            content: @Composable () -> Unit
+        ) {
             CompositionLocalProvider(
-                local provides composeValues.mainScreenValues(), content = content
+                local provides composeValues.mainScreenValues(figure, radius, figureLength, distance),
+                content = content
             )
         }
 
@@ -30,8 +38,9 @@ interface ComposeDependencies {
         }
 
         @Composable
-        override fun MainScreenDeps(loc: @Composable MainDeps.() -> Unit)
-        { loc(local.current) }
+        override fun MainScreenDeps(loc: @Composable MainDeps.() -> Unit) {
+            loc(local.current)
+        }
 
         @Composable
         override fun mainScreenDepsLocal() = local.current

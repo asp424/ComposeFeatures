@@ -21,9 +21,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         appComponent.inject(this)
         setContent {
-            composeDependencies.MainScreenDependencies {
-                screens.CustomSlider(50f, 100f, Figures.SINUS)
-            }
+            composeDependencies.MainScreenDependencies(
+                Figures.SINUS, 50f, 1000, 100f
+            ) { screens.CustomSlider() }
         }
     }
 }

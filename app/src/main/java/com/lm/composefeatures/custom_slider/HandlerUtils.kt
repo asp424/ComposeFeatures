@@ -17,7 +17,7 @@ import kotlin.math.sin
 interface HandlerUtils {
 
     @Composable
-    fun Modifier.boxMod(radius: Float): Modifier
+    fun Modifier.boxMod(): Modifier
 
     fun DrawScope.draw(radius: Float, offset: Offset)
 
@@ -28,23 +28,25 @@ interface HandlerUtils {
     fun Float.Circle(): Offset
 
     @Composable
-    fun CompareOffsets(radius: Float): Boolean
+    fun CompareOffsets(): Boolean
 
     @Composable
     fun CheckInList(): Boolean
 
     @Composable
-    fun CheckInListAndGetSinusByEventX(figure: Figures)
+    fun CheckInListAndGetSinusByEventX()
 
     @Composable
     fun Float.SinusByEventX(): Offset
+
+    fun Int.sinusOffset(scaleX: Float, scaleY: Float, width: Float, height: Float): Offset
 
     class Base @Inject constructor(
         private val composeDependencies: ComposeDependencies
     ) : HandlerUtils {
 
         @Composable
-        override fun Modifier.boxMod(radius: Float) =
+        override fun Modifier.boxMod() =
             with(composeDependencies.mainScreenDepsLocal()) {
                 with(LocalDensity.current) {
                     offset(
@@ -69,11 +71,13 @@ interface HandlerUtils {
         }
 
         @Composable
-        override fun CompareOffsets(radius: Float) =
+        override fun CompareOffsets() =
             with(composeDependencies.mainScreenDepsLocal()) {
-                offset.x in eventOffset.x.minus(radius)..eventOffset.x.plus(radius)
-                        && offset.y in eventOffset.y.minus(radius)..
-                        eventOffset.y.plus(radius) && strike
+                with(radius + distance) {
+                    offset.x in eventOffset.x.minus(this)..eventOffset.x.plus(this)
+                            && offset.y in eventOffset.y.minus(this)..
+                            eventOffset.y.plus(this) && strike
+                }
             }
 
         @Composable
@@ -88,8 +92,11 @@ interface HandlerUtils {
                 ((this@SinusByEventX - width) / scaleX).Sinus()
             }
 
+        override fun Int.sinusOffset(scaleX: Float, scaleY: Float, width: Float, height: Float) =
+            Offset(this * 0.01f * scaleX + width, scaleY * sin(this * 0.01f) + height)
+
         @Composable
-        override fun CheckInListAndGetSinusByEventX(figure: Figures) =
+        override fun CheckInListAndGetSinusByEventX() =
             composeDependencies.MainScreenDeps {
                 if (CheckInList()) {
                     when (figure) {

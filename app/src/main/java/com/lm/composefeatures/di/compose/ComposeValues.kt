@@ -4,7 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
@@ -15,12 +14,22 @@ import javax.inject.Inject
 interface ComposeValues {
 
     @Composable
-    fun mainScreenValues(): MainDeps
+    fun mainScreenValues(
+        figure: Figures,
+        radius: Float,
+        figureLength: Int,
+        distance: Float
+    ): MainDeps
 
     class Base @Inject constructor() : ComposeValues {
 
         @Composable
-        override fun mainScreenValues() =
+        override fun mainScreenValues(
+            figure: Figures,
+            radius: Float,
+            figureLength: Int,
+            distance: Float
+        ) =
             with(LocalConfiguration.current) {
                 with(LocalDensity.current) {
                     MainDeps(
@@ -30,11 +39,14 @@ interface ComposeValues {
                         _scaleX = remember { mutableStateOf(90f) },
                         _scaleY = remember { mutableStateOf(20f) },
                         _eventOffset = remember { mutableStateOf(Offset.Zero) },
-                        listPoints = remember { mutableStateListOf() },
+                        _listPoints = remember { mutableStateListOf() },
                         _action = remember { mutableStateOf(-1) },
                         _startMove = remember { mutableStateOf(false) },
-                        _strike = remember { mutableStateOf(false) }
-                    )
+                        _strike = remember { mutableStateOf(false) },
+                    ).apply {
+                        figure.setFigure; radius.setRadius; figureLength.setFigureLength
+                        distance.setDistance
+                    }
                 }
             }
     }

@@ -10,8 +10,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.dp
+import com.lm.composefeatures.core.log
 import com.lm.composefeatures.di.compose.ComposeDependencies
 import javax.inject.Inject
 
@@ -26,11 +26,12 @@ interface DebugWidgets {
 
         @Composable
         override fun Debug() {
-            composeDependencies.MainScreenDeps{
+            composeDependencies.MainScreenDeps {
                 val buttonText by remember { mutableStateOf("Go") }
                 var buttonEnable by remember { mutableStateOf(true) }
 
                 LaunchedEffect(scaleX) {
+                    scaleX.log
                     if (scaleX == 90f) buttonEnable = true
                 }
 
