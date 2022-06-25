@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -49,8 +50,7 @@ interface MainScreenHandler {
             with(composeDependencies.mainScreenDepsLocal()) {
                 with(handlerUtils) {
                     if (strike) CheckInListAndGetSinusByEventX()
-                    if (!CompareOffsets() || action == 1)
-                        false.setStrike
+                    if (!CompareOffsets() || action == 1) false.setStrike
                 }
             }
 
@@ -58,12 +58,9 @@ interface MainScreenHandler {
         @Composable
         override fun BoxWithCanvas() =
             composeDependencies.MainScreenDeps {
-                Box(modifier = Modifier
-                    .fillMaxSize()
+                Box(modifier = Modifier.fillMaxSize()
                     .motionEventSpy { it.action.setAction; Offset(it.x, it.y).setEventOffset }
-                ) {
-                    DrawFigure()
-                }
+                ) { DrawFigure() }
             }
 
         @Composable
@@ -78,10 +75,7 @@ interface MainScreenHandler {
         @Composable
         override fun DrawBall() = with(handlerUtils) {
             composeDependencies.MainScreenDeps {
-                Box(
-                    Modifier
-                        .boxMod()
-                        .pointerInput(Unit) {
+                Box(Modifier.boxMod().pointerInput(Unit) {
                             detectTapGestures(onPress = { true.setStrike })
                         }
                 ) { Canvas(Modifier) { draw(radius, Offset(radius, radius)) } }
@@ -92,17 +86,9 @@ interface MainScreenHandler {
         override fun InitListPoints() {
             with(composeDependencies.mainScreenDepsLocal()) {
                 LaunchedEffect(scaleX, scaleY) {
-                    with(listPoints) {
-                        clear()
-                        handlerUtils.apply {
-                            (0..figureLength).onEach {
-                                add(
-                                    it.sinusOffset(scaleX, scaleY, width, height)
-                                        .apply { setOffset }
-                                )
-                            }
-                        }
-                    }
+                    handlerUtils.addPointsToList(
+                        listPoints, figureLength, scaleX, scaleY, width, height
+                    ){ it.setOffset }
                 }
             }
         }

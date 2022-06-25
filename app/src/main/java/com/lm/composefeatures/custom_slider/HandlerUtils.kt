@@ -3,6 +3,7 @@ package com.lm.composefeatures.custom_slider
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color.Companion.Black
@@ -41,6 +42,12 @@ interface HandlerUtils {
 
     fun Int.sinusOffset(scaleX: Float, scaleY: Float, width: Float, height: Float): Offset
 
+    fun addPointsToList(
+        listPoints: SnapshotStateList<Offset>, figureLength: Int, scaleX: Float,
+        scaleY: Float, width: Float, height: Float,
+        onTick: (Offset) -> Unit
+    ): IntRange
+
     class Base @Inject constructor(
         private val composeDependencies: ComposeDependencies
     ) : HandlerUtils {
@@ -56,18 +63,35 @@ interface HandlerUtils {
                 }
             }
 
+        override fun addPointsToList(
+            listPoints: SnapshotStateList<Offset>, figureLength: Int, scaleX: Float,
+            scaleY: Float, width: Float, height: Float,
+            onTick: (Offset) -> Unit
+        ) = with(listPoints) {
+            clear(); (0..figureLength).onEach { add(
+            it.sinusOffset(scaleX, scaleY, width, height)
+                .apply { onTick(this) }
+            ) }
+        }
+
         override fun DrawScope.draw(radius: Float, offset: Offset) =
             drawCircle(Black, radius, offset)
 
         @Composable
         override fun Float.Sinus(): Offset =
             with(composeDependencies.mainScreenDepsLocal()) {
-            Offset(this@Sinus * scaleX + width, scaleY * sin(this@Sinus) + height)
+            Offset(
+                this@Sinus * scaleX + width, scaleY * sin(this@Sinus) + height
+            )
         }
 
         @Composable
-        override fun Float.Circle() = with(composeDependencies.mainScreenDepsLocal()){
-            Offset(scaleX * sin(this@Circle) + width, scaleX * cos(this@Circle) + height)
+        override fun Float.Circle() = with(
+            composeDependencies.mainScreenDepsLocal()
+        ){
+            Offset(
+                scaleX * sin(this@Circle) + width, scaleX * cos(this@Circle) + height
+            )
         }
 
         @Composable

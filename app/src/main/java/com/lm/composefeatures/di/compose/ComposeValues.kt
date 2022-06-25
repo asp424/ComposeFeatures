@@ -14,11 +14,7 @@ import javax.inject.Inject
 interface ComposeValues {
 
     @Composable
-    fun mainScreenValues(
-        figure: Figures,
-        radius: Float,
-        figureLength: Int,
-        distance: Float
+    fun mainScreenValues(figure: Figures, radius: Float, figureLength: Int, distance: Float
     ): MainDeps
 
     class Base @Inject constructor() : ComposeValues {
