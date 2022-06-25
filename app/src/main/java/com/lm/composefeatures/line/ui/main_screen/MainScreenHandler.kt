@@ -1,8 +1,12 @@
 package com.lm.composefeatures.line.ui.main_screen
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.snapshots.SnapshotStateList
@@ -10,8 +14,13 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color.Companion.Black
+import androidx.compose.ui.graphics.Color.Companion.Gray
+import androidx.compose.ui.graphics.Color.Companion.Green
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.input.pointer.motionEventSpy
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.dp
 import com.lm.composefeatures.di.compose.ComposeDependencies
 import javax.inject.Inject
 import kotlin.math.cos
@@ -32,7 +41,9 @@ interface MainScreenHandler {
     fun DrawFigure(
         listPoints: SnapshotStateList<Offset>,
         offset: Offset,
-        radius: Float
+        radius: Float,
+        distance: Float,
+        onPress: () -> Unit
     )
 
     @Composable
@@ -42,8 +53,12 @@ interface MainScreenHandler {
         eventOffset: Offset,
         offset: Offset,
         sinScaleX: Float,
-        sinScaleY: Float, distance: Float, figure: Figures,
-        onCheck: (Offset) -> Unit
+        sinScaleY: Float,
+        distance: Float,
+        figure: Figures,
+        strike: Boolean,
+        action: Int,
+        onCheck: (Offset) -> Unit, onAction: (Boolean) -> Unit
     )
 
     @Composable
@@ -54,7 +69,9 @@ interface MainScreenHandler {
         figure: Figures,
         offset: Offset,
         radius: Float,
-        onEvent: (Int, Offset) -> Unit
+        distance: Float,
+        onEvent: (Int, Offset) -> Unit,
+        onPress: () -> Unit
     )
 
     @Composable
@@ -78,10 +95,12 @@ interface MainScreenHandler {
             sinScaleY: Float,
             distance: Float,
             figure: Figures,
-            onCheck: (Offset) -> Unit
+            strike: Boolean,
+            action: Int,
+            onCheck: (Offset) -> Unit, onAction: (Boolean) -> Unit
         ) = with(composeDependencies.mainScreenDeps()) {
             LaunchedEffect(eventOffset) {
-                if (offset.check(eventOffset, radius + distance))
+                if (strike) {
                     if (eventOffset.x in listPoints.first().x..listPoints.last().x)
                         onCheck(
                             when (figure) {
@@ -93,21 +112,11 @@ interface MainScreenHandler {
                                             sinScaleX).circle(width, sinScaleX, height)
                             }
                         )
-
-            }
-            LaunchedEffect(sinScaleX){
-                if (eventOffset.x in listPoints.first().x..listPoints.last().x) {
-                    onCheck(
-                        when (figure) {
-                            Figures.SINUS ->
-                                ((eventOffset.x - width) /
-                                        sinScaleX).sinus(width, sinScaleX, height, sinScaleY)
-                            Figures.CIRCLE ->
-                                ((eventOffset.x - width) /
-                                        sinScaleX).circle(width, sinScaleX, height)
-                        }
-                    )
                 }
+                if (!offset.check(eventOffset, radius + distance, strike)) onAction(false)
+            }
+            LaunchedEffect(action) {
+                if (action == 1) onAction(false)
             }
         }
 
@@ -120,22 +129,48 @@ interface MainScreenHandler {
             figure: Figures,
             offset: Offset,
             radius: Float,
-            onEvent: (Int, Offset) -> Unit
+            distance: Float,
+            onEvent: (Int, Offset) -> Unit,
+            onPress: () -> Unit
         ) = Box(modifier = Modifier
             .fillMaxSize()
             .motionEventSpy { onEvent(it.action, Offset(it.x, it.y)) }
         ) {
-            DrawFigure(listPoints, offset, radius)
+            DrawFigure(listPoints, offset, radius, distance, onPress)
         }
 
         @Composable
         override fun DrawFigure(
             listPoints: SnapshotStateList<Offset>,
             offset: Offset,
-            radius: Float
-        ) = Canvas(Modifier) {
-            listPoints.forEach { draw(it, 10f) }
-            draw(offset, radius)
+            radius: Float,
+            distance: Float,
+            onPress: () -> Unit
+        ) {
+            Canvas(Modifier) {
+                listPoints.forEach { draw(it, 10f) }
+            }
+            LocalDensity.current.apply {
+                Box(
+                    Modifier
+                        .size(radius.toDp() * 2)
+                        .offset(
+                            offset.x.toDp() - radius.toDp(),
+                            offset.y.toDp() - radius.toDp()
+                        )
+                        .pointerInput(Unit) {
+                            detectTapGestures(
+                                onPress = {
+                                    onPress()
+                                }
+                            )
+                        }.background(Green)
+                ) {
+                    Canvas(Modifier) {
+                        draw(Offset(radius, radius), radius)
+                    }
+                }
+            }
         }
 
         private fun DrawScope.draw(
@@ -167,7 +202,7 @@ interface MainScreenHandler {
                             }
                         }
                     }
-                    LaunchedEffect(true){
+                    LaunchedEffect(true) {
                         onAddFloat(get(0))
                     }
                 }
@@ -184,10 +219,10 @@ interface MainScreenHandler {
         private fun Float.circle(width: Float, sinScaleX: Float, height: Float) =
             Offset(sinScaleX * sin(this) + width, sinScaleX * cos(this) + height)
 
-        private fun Offset.check(eventOffset: Offset, radius: Float) =
+        private fun Offset.check(eventOffset: Offset, radius: Float, strike: Boolean) =
             with(eventOffset) {
                 x in this@check.x - radius..this@check.x + radius
-                        && y in this@check.y - radius..this@check.y + radius
+                        && y in this@check.y - radius..this@check.y + radius && strike
             }
 
         @Composable
