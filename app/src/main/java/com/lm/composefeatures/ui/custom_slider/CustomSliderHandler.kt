@@ -31,15 +31,6 @@ interface CustomSliderHandler {
     @Composable
     fun BoxWithCanvas()
 
-    @Composable
-    fun AutoMoveBall()
-
-    @Composable
-    fun Debug()
-
-    @Composable
-    fun DrawDistance()
-
     class Base @Inject constructor(
         private val composeDependencies: ComposeDependencies,
         private val autoMoveBall: MoveBall,
@@ -94,14 +85,5 @@ interface CustomSliderHandler {
                 }
             }
         }
-
-        @Composable
-        override fun AutoMoveBall() = autoMoveBall.AutoMoveBallByTimer()
-
-        @Composable
-        override fun Debug() = debugWidgets.Debug()
-
-        @Composable
-        override fun DrawDistance() = debugWidgets.DrawDistance()
     }
 }
