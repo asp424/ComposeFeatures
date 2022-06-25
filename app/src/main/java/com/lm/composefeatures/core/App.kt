@@ -1,4 +1,4 @@
-package com.lm.composefeatures
+package com.lm.composefeatures.core
 
 import android.app.Application
 import android.content.Context

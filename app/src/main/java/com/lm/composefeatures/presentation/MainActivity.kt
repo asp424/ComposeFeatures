@@ -1,10 +1,11 @@
-package com.lm.composefeatures
+package com.lm.composefeatures.presentation
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import com.lm.composefeatures.core.appComponent
 import com.lm.composefeatures.di.compose.ComposeDependencies
-import com.lm.composefeatures.line.ui.Screens
+import com.lm.composefeatures.ui.Screens
 import javax.inject.Inject
 
 class MainActivity : ComponentActivity() {
@@ -20,7 +21,7 @@ class MainActivity : ComponentActivity() {
         appComponent.inject(this)
         setContent {
             composeDependencies.MainScreenDependencies {
-                screens.MainScreen()
+                screens.CustomSlider()
             }
         }
     }

@@ -1,10 +1,9 @@
-package com.lm.composefeatures.line.ui.main_screen
+package com.lm.composefeatures.custom_slider
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Rect
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.asFlow

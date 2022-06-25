@@ -1,6 +1,6 @@
 package com.lm.composefeatures.di.dagger.modules
 
-import com.lm.composefeatures.line.ui.ViewModels
+import com.lm.composefeatures.presentation.ViewModels
 import dagger.Binds
 import dagger.Module
 import javax.inject.Singleton

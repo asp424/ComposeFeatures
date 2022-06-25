@@ -1,7 +1,7 @@
 package com.lm.composefeatures.di.dagger.modules
 
 import androidx.lifecycle.ViewModel
-import com.lm.composefeatures.line.ui.MainViewModel
+import com.lm.composefeatures.presentation.MainViewModel
 import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoMap

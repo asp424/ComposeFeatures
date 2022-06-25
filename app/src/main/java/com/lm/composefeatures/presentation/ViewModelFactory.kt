@@ -1,4 +1,4 @@
-package com.lm.composefeatures.line.ui
+package com.lm.composefeatures.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider

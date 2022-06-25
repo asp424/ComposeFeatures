@@ -1,4 +1,4 @@
-package com.lm.composefeatures.animation
+package com.lm.composefeatures.custom_progress.animation
 
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalAnimationApi

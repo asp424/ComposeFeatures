@@ -1,6 +1,6 @@
 package com.lm.composefeatures.di.dagger.modules
 
-import com.lm.composefeatures.line.ui.main_screen.MoveBall
+import com.lm.composefeatures.custom_slider.MoveBall
 import dagger.Binds
 import dagger.Module
 import javax.inject.Singleton

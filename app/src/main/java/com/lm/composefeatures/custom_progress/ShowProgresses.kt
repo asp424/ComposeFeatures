@@ -1,4 +1,4 @@
-package com.lm.composefeatures
+package com.lm.composefeatures.custom_progress
 
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.*
@@ -22,8 +22,8 @@ import androidx.compose.ui.unit.dp
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
-import com.lm.composefeatures.animation.enterLeftToRight
-import com.lm.composefeatures.animation.exitLeftToRight
+import com.lm.composefeatures.custom_progress.animation.enterLeftToRight
+import com.lm.composefeatures.custom_progress.animation.exitLeftToRight
 import com.lm.expandedcolumn.ExpandedColumn
 import com.lm.expandedcolumn.ExpandedItem
 

@@ -1,6 +1,6 @@
 package com.lm.composefeatures.di.dagger
 
-import com.lm.composefeatures.MainActivity
+import com.lm.composefeatures.presentation.MainActivity
 import dagger.Component
 import javax.inject.Singleton
 
