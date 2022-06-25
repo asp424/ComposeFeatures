@@ -15,7 +15,7 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 
-interface HandlerUtils {
+interface CustomSliderHandlerHelper {
 
     @Composable
     fun Modifier.boxMod(): Modifier
@@ -50,7 +50,7 @@ interface HandlerUtils {
 
     class Base @Inject constructor(
         private val composeDependencies: ComposeDependencies
-    ) : HandlerUtils {
+    ) : CustomSliderHandlerHelper {
 
         @Composable
         override fun Modifier.boxMod() =

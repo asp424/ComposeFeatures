@@ -8,14 +8,14 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 @Module(
     includes = [
         ViewModelFactoryModule::class,
-        MainScreenHandlerModule::class,
+        CustomSliderHandlerModule::class,
         ScreensModule::class,
         ViewModelsModule::class,
         ComposeDependenciesModule::class,
         ComposeValuesModule::class,
         MoveBallModule::class,
         DebugWidgetsModule::class,
-        HandlerUtilsModule::class
+        CustomSliderHandlerHelperModule::class
     ]
 )
 interface AppMapModules

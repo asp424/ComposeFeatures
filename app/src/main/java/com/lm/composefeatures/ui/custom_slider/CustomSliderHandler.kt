@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -15,7 +14,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import com.lm.composefeatures.di.compose.ComposeDependencies
 import javax.inject.Inject
 
-interface MainScreenHandler {
+interface CustomSliderHandler {
 
     @Composable
     fun InitListPoints()
@@ -38,12 +37,15 @@ interface MainScreenHandler {
     @Composable
     fun Debug()
 
+    @Composable
+    fun DrawDistance()
+
     class Base @Inject constructor(
         private val composeDependencies: ComposeDependencies,
         private val autoMoveBall: MoveBall,
         private val debugWidgets: DebugWidgets,
-        private val handlerUtils: HandlerUtils
-    ) : MainScreenHandler {
+        private val handlerUtils: CustomSliderHandlerHelper
+    ) : CustomSliderHandler {
 
         @Composable
         override fun CheckForStrike() =
@@ -98,5 +100,8 @@ interface MainScreenHandler {
 
         @Composable
         override fun Debug() = debugWidgets.Debug()
+
+        @Composable
+        override fun DrawDistance() = debugWidgets.DrawDistance()
     }
 }

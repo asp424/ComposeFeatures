@@ -1,6 +1,7 @@
 package com.lm.composefeatures.di.compose
 
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.geometry.Offset
@@ -22,7 +23,7 @@ data class MainDeps(
     private val _startMove: MutableState<Boolean>,
     private val _strike: MutableState<Boolean>
 ) {
-    val Offset.setOffset get() = run { _offset.value = this }
+    val Offset.setOffset get() = run{ _offset.value = this }
     val Float.setScaleX get() = run { _scaleX.value = this }
     val Float.setScaleY get() = run { _scaleY.value = this }
     val Offset.setEventOffset get() = run { _eventOffset.value = this }
