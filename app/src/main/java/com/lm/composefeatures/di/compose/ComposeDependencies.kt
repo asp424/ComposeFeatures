@@ -7,10 +7,13 @@ import javax.inject.Inject
 
 interface ComposeDependencies {
     @Composable
+    fun mainScreenDepsLocal(): MainDeps
+
+    @Composable
     fun MainScreenDependencies(content: @Composable () -> Unit)
 
     @Composable
-    fun mainScreenDeps(): MainDeps
+    fun MainScreenDeps(loc: @Composable MainDeps.() -> Unit)
 
     class Base @Inject constructor(
         private val composeValues: ComposeValues
@@ -27,6 +30,10 @@ interface ComposeDependencies {
         }
 
         @Composable
-        override fun mainScreenDeps() = local.current
+        override fun MainScreenDeps(loc: @Composable MainDeps.() -> Unit)
+        { loc(local.current) }
+
+        @Composable
+        override fun mainScreenDepsLocal() = local.current
     }
 }

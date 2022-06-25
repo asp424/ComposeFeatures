@@ -2,11 +2,13 @@ package com.lm.composefeatures.custom_slider
 
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.unit.Density
+import androidx.compose.ui.platform.LocalDensity
+import com.lm.composefeatures.di.compose.ComposeDependencies
 import javax.inject.Inject
 import kotlin.math.cos
 import kotlin.math.sin
@@ -14,63 +16,87 @@ import kotlin.math.sin
 
 interface HandlerUtils {
 
-    fun Modifier.boxMod(
-        density: Density, offset: Offset, radius: Float
-    ): Modifier
+    @Composable
+    fun Modifier.boxMod(radius: Float): Modifier
 
-    fun DrawScope.draw(
-        offset: Offset,
-        radius: Float
-    )
+    fun DrawScope.draw(radius: Float, offset: Offset)
 
-    fun Float.sinus(
-        width: Float,
-        scaleX: Float,
-        height: Float,
-        scaleY: Float
-    ): Offset
+    @Composable
+    fun Float.Sinus(): Offset
 
-    fun Float.circle(
-        width: Float,
-        scaleX: Float,
-        height: Float
-    ): Offset
+    @Composable
+    fun Float.Circle(): Offset
 
-    fun Offset.check(eventOffset: Offset, radius: Float, strike: Boolean): Boolean
+    @Composable
+    fun CompareOffsets(radius: Float): Boolean
 
-    class Base @Inject constructor(): HandlerUtils {
+    @Composable
+    fun CheckInList(): Boolean
 
-        override fun Modifier.boxMod(
-            density: Density, offset: Offset, radius: Float
-        ) = with(density) {
-            offset(
-                offset.x.toDp() - radius.toDp(),
-                offset.y.toDp() - radius.toDp()
-            ).size(radius.toDp() * 2)
+    @Composable
+    fun CheckInListAndGetSinusByEventX(figure: Figures)
+
+    @Composable
+    fun Float.SinusByEventX(): Offset
+
+    class Base @Inject constructor(
+        private val composeDependencies: ComposeDependencies
+    ) : HandlerUtils {
+
+        @Composable
+        override fun Modifier.boxMod(radius: Float) =
+            with(composeDependencies.mainScreenDepsLocal()) {
+                with(LocalDensity.current) {
+                    offset(
+                        offset.x.toDp() - radius.toDp(),
+                        offset.y.toDp() - radius.toDp()
+                    ).size(radius.toDp() * 2)
+                }
+            }
+
+        override fun DrawScope.draw(radius: Float, offset: Offset) =
+            drawCircle(Black, radius, offset)
+
+        @Composable
+        override fun Float.Sinus(): Offset =
+            with(composeDependencies.mainScreenDepsLocal()) {
+            Offset(this@Sinus * scaleX + width, scaleY * sin(this@Sinus) + height)
         }
 
-        override fun DrawScope.draw(
-            offset: Offset,
-            radius: Float
-        ) = drawCircle(Color.Black, radius, offset)
+        @Composable
+        override fun Float.Circle() = with(composeDependencies.mainScreenDepsLocal()){
+            Offset(scaleX * sin(this@Circle) + width, scaleX * cos(this@Circle) + height)
+        }
 
-        override fun Float.sinus(
-            width: Float,
-            scaleX: Float,
-            height: Float,
-            scaleY: Float
-        ) = Offset(this * scaleX + width, scaleY * sin(this) + height)
+        @Composable
+        override fun CompareOffsets(radius: Float) =
+            with(composeDependencies.mainScreenDepsLocal()) {
+                offset.x in eventOffset.x.minus(radius)..eventOffset.x.plus(radius)
+                        && offset.y in eventOffset.y.minus(radius)..
+                        eventOffset.y.plus(radius) && strike
+            }
 
-        override fun Float.circle(
-            width: Float,
-            scaleX: Float,
-            height: Float
-        ) = Offset(scaleX * sin(this) + width, scaleX * cos(this) + height)
+        @Composable
+        override fun CheckInList() =
+            with(composeDependencies.mainScreenDepsLocal()) {
+            eventOffset.x in listPoints.first().x..listPoints.last().x
+        }
 
-        override fun Offset.check(eventOffset: Offset, radius: Float, strike: Boolean) =
-            with(eventOffset) {
-                x in this@check.x - radius..this@check.x + radius
-                        && y in this@check.y - radius..this@check.y + radius && strike
+        @Composable
+        override fun Float.SinusByEventX() =
+            with(composeDependencies.mainScreenDepsLocal()) {
+                ((this@SinusByEventX - width) / scaleX).Sinus()
+            }
+
+        @Composable
+        override fun CheckInListAndGetSinusByEventX(figure: Figures) =
+            composeDependencies.MainScreenDeps {
+                if (CheckInList()) {
+                    when (figure) {
+                        Figures.SINUS -> { eventOffset.x.SinusByEventX().setOffset }
+                        Figures.CIRCLE -> Unit
+                    }
+                }
             }
     }
 }

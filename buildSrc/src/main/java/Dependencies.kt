@@ -1,5 +1,7 @@
 val implList = with(composeVersion) {
     listOf(
+        "org.jetbrains.kotlin:kotlin-reflect:1.7.0",
+        "org.jetbrains.kotlin:kotlin-reflect:1.7.0",
         "androidx.core:core-ktx:1.9.0-alpha03",
         "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1",
         // "androidx.appcompat:appcompat:1.4.1",
