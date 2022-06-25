@@ -14,13 +14,13 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color.Companion.Black
-import androidx.compose.ui.graphics.Color.Companion.Gray
 import androidx.compose.ui.graphics.Color.Companion.Green
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.input.pointer.motionEventSpy
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.Density
+import com.lm.composefeatures.core.log
 import com.lm.composefeatures.di.compose.ComposeDependencies
 import javax.inject.Inject
 import kotlin.math.cos
@@ -31,8 +31,8 @@ interface MainScreenHandler {
     @Composable
     fun InitListPoints(
         listPoints: SnapshotStateList<Offset>,
-        sinScaleX: Float,
-        sinScaleY: Float,
+        scaleX: Float,
+        scaleY: Float,
         figure: Figures,
         onAddFloat: (Offset) -> Unit, onInit: () -> Unit
     )
@@ -42,7 +42,6 @@ interface MainScreenHandler {
         listPoints: SnapshotStateList<Offset>,
         offset: Offset,
         radius: Float,
-        distance: Float,
         onPress: () -> Unit
     )
 
@@ -52,8 +51,8 @@ interface MainScreenHandler {
         radius: Float,
         eventOffset: Offset,
         offset: Offset,
-        sinScaleX: Float,
-        sinScaleY: Float,
+        scaleX: Float,
+        scaleY: Float,
         distance: Float,
         figure: Figures,
         strike: Boolean,
@@ -64,12 +63,11 @@ interface MainScreenHandler {
     @Composable
     fun BoxWithCanvas(
         listPoints: SnapshotStateList<Offset>,
-        sinScaleX: Float,
-        sinScaleY: Float,
+        scaleX: Float,
+        scaleY: Float,
         figure: Figures,
         offset: Offset,
         radius: Float,
-        distance: Float,
         onEvent: (Int, Offset) -> Unit,
         onPress: () -> Unit
     )
@@ -91,8 +89,8 @@ interface MainScreenHandler {
             radius: Float,
             eventOffset: Offset,
             offset: Offset,
-            sinScaleX: Float,
-            sinScaleY: Float,
+            scaleX: Float,
+            scaleY: Float,
             distance: Float,
             figure: Figures,
             strike: Boolean,
@@ -106,17 +104,17 @@ interface MainScreenHandler {
                             when (figure) {
                                 Figures.SINUS ->
                                     ((eventOffset.x - width) /
-                                            sinScaleX).sinus(width, sinScaleX, height, sinScaleY)
+                                            scaleX).sinus(width, scaleX, height, scaleY)
                                 Figures.CIRCLE ->
                                     ((eventOffset.x - width) /
-                                            sinScaleX).circle(width, sinScaleX, height)
+                                            scaleX).circle(
+                                        width, scaleX, height
+                                    )
                             }
                         )
                 }
-                if (!offset.check(eventOffset, radius + distance, strike)) onAction(false)
-            }
-            LaunchedEffect(action) {
-                if (action == 1) onAction(false)
+                if (!offset.check(eventOffset, radius + distance, strike) || action == 1)
+                    onAction(false)
             }
         }
 
@@ -124,19 +122,18 @@ interface MainScreenHandler {
         @Composable
         override fun BoxWithCanvas(
             listPoints: SnapshotStateList<Offset>,
-            sinScaleX: Float,
-            sinScaleY: Float,
+            scaleX: Float,
+            scaleY: Float,
             figure: Figures,
             offset: Offset,
             radius: Float,
-            distance: Float,
             onEvent: (Int, Offset) -> Unit,
             onPress: () -> Unit
         ) = Box(modifier = Modifier
             .fillMaxSize()
             .motionEventSpy { onEvent(it.action, Offset(it.x, it.y)) }
         ) {
-            DrawFigure(listPoints, offset, radius, distance, onPress)
+            DrawFigure(listPoints, offset, radius, onPress)
         }
 
         @Composable
@@ -144,33 +141,60 @@ interface MainScreenHandler {
             listPoints: SnapshotStateList<Offset>,
             offset: Offset,
             radius: Float,
-            distance: Float,
             onPress: () -> Unit
         ) {
             Canvas(Modifier) {
                 listPoints.forEach { draw(it, 10f) }
             }
-            LocalDensity.current.apply {
-                Box(
-                    Modifier
-                        .size(radius.toDp() * 2)
-                        .offset(
-                            offset.x.toDp() - radius.toDp(),
-                            offset.y.toDp() - radius.toDp()
-                        )
-                        .pointerInput(Unit) {
-                            detectTapGestures(
-                                onPress = {
-                                    onPress()
+
+            Box(Modifier.boxMod(LocalDensity.current, offset, radius)
+                    .pointerInput(Unit) { detectTapGestures(onPress = { onPress() }) }
+            ) { Canvas(Modifier) { draw(Offset(radius, radius), radius) } }
+        }
+
+
+        @Composable
+        override fun InitListPoints(
+            listPoints: SnapshotStateList<Offset>,
+            scaleX: Float,
+            scaleY: Float,
+            figure: Figures,
+            onAddFloat: (Offset) -> Unit, onInit: () -> Unit
+        ) {
+            composeDependencies.mainScreenDeps().apply {
+                listPoints.apply {
+                    LaunchedEffect(
+                        scaleX, scaleY
+                    ) {
+                        clear()
+                        (0..1000).onEach {
+                            (it * 0.01f).also { k ->
+                                when (figure) {
+                                    Figures.SINUS -> k.sinus(
+                                        width, scaleX, height, scaleY
+                                    )
+                                    Figures.CIRCLE -> k.circle(
+                                        width, scaleX, height
+                                    )
+                                }.apply {
+                                    add(this)
+                                    onAddFloat(get(size / 2))
                                 }
-                            )
-                        }.background(Green)
-                ) {
-                    Canvas(Modifier) {
-                        draw(Offset(radius, radius), radius)
+                                if (it == 300) onInit()
+                            }
+                        }
                     }
                 }
             }
+        }
+
+        private fun Modifier.boxMod(
+            density: Density, offset: Offset, radius: Float
+        ) = with(density) {
+            offset(
+                offset.x.toDp() - radius.toDp(),
+                offset.y.toDp() - radius.toDp()
+            ).size(radius.toDp() * 2)
         }
 
         private fun DrawScope.draw(
@@ -178,46 +202,18 @@ interface MainScreenHandler {
             radius: Float
         ) = drawCircle(Black, radius, offset)
 
-        @Composable
-        override fun InitListPoints(
-            listPoints: SnapshotStateList<Offset>,
-            sinScaleX: Float,
-            sinScaleY: Float,
-            figure: Figures,
-            onAddFloat: (Offset) -> Unit, onInit: () -> Unit
-        ) {
-            composeDependencies.mainScreenDeps().apply {
-                listPoints.apply {
-                    LaunchedEffect(sinScaleX, sinScaleY) {
-                        clear()
-                        (0..1000).onEach {
-                            (it * 0.01f).also { k ->
-                                when (figure) {
-                                    Figures.SINUS -> k.sinus(width, sinScaleX, height, sinScaleY)
-                                    Figures.CIRCLE -> k.circle(width, sinScaleX, height)
-                                }.apply {
-                                    add(this)
-                                }
-                                if (it == 300) onInit()
-                            }
-                        }
-                    }
-                    LaunchedEffect(true) {
-                        onAddFloat(get(0))
-                    }
-                }
-            }
-        }
-
         private fun Float.sinus(
             width: Float,
-            sinScaleX: Float,
+            scaleX: Float,
             height: Float,
-            sinScaleY: Float
-        ) = Offset(this * sinScaleX + width, sinScaleY * sin(this) + height)
+            scaleY: Float
+        ) = Offset(this * scaleX + width, scaleY * sin(this) + height)
 
-        private fun Float.circle(width: Float, sinScaleX: Float, height: Float) =
-            Offset(sinScaleX * sin(this) + width, sinScaleX * cos(this) + height)
+        private fun Float.circle(
+            width: Float,
+            scaleX: Float,
+            height: Float
+        ) = Offset(scaleX * sin(this) + width, scaleX * cos(this) + height)
 
         private fun Offset.check(eventOffset: Offset, radius: Float, strike: Boolean) =
             with(eventOffset) {
