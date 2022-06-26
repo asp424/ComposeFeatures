@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
@@ -32,8 +33,8 @@ interface ComposeValues {
                         width = 80f,
                         height = screenHeightDp.dp.toPx() / 3,
                         _offset = remember { mutableStateOf(Offset.Zero) },
-                        _scaleX = remember { mutableStateOf(90f) },
-                        _scaleY = remember { mutableStateOf(20f) },
+                        _scaleX = rememberSaveable { mutableStateOf(90f) },
+                        _scaleY = rememberSaveable { mutableStateOf(20f) },
                         _eventOffset = remember { mutableStateOf(Offset.Zero) },
                         _listPoints = remember { mutableStateListOf() },
                         _action = remember { mutableStateOf(-1) },

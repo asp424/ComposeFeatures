@@ -3,11 +3,11 @@ package com.lm.composefeatures.ui.custom_slider
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.Slider
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Abc
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -62,8 +62,8 @@ interface DebugWidgets {
                 val buttonText by remember { mutableStateOf("Go") }
                 var buttonEnable by remember { mutableStateOf(true) }
 
-                LaunchedEffect(scaleX) {
-                    if (scaleX == 90f) buttonEnable = true
+                LaunchedEffect(offset) {
+                    if (offset.x == listPoints.last().x) buttonEnable = true
                 }
 
 
@@ -77,19 +77,17 @@ interface DebugWidgets {
 
                     Slider(
                         value = scaleY,
-                        onValueChange = {
-                            it.setScaleY
-                        },
+                        onValueChange = { if (!startMove) it.setScaleY },
                         valueRange = (0f..100f),
                         modifier = Modifier
                     )
                     Slider(
-                        value = scaleX, onValueChange = { it.setScaleX },
+                        value = scaleX, onValueChange = { if (!startMove) it.setScaleX },
                         valueRange = (0f..90f), modifier = Modifier
                     )
 
                     Slider(
-                        value = distance, onValueChange = { it.setDistance },
+                        value = distance, onValueChange = {  it.setDistance },
                         valueRange = (0f..500f), modifier = Modifier
                     )
 
