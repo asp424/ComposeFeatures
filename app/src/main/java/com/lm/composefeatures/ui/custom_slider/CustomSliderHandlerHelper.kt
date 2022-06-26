@@ -1,5 +1,6 @@
 package com.lm.composefeatures.ui.custom_slider
 
+import androidx.annotation.FloatRange
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
@@ -29,7 +30,10 @@ interface CustomSliderHandlerHelper {
     fun Float.Circle(): Offset
 
     @Composable
-    fun CompareOffsets(): Boolean
+    fun IsFingerOnBall(): Boolean
+
+    @Composable
+    fun CompareOffsetsY(): Boolean
 
     @Composable
     fun CheckInList(): Boolean
@@ -41,6 +45,11 @@ interface CustomSliderHandlerHelper {
     fun Float.SinusByEventX(): Offset
 
     fun Int.sinusOffset(scaleX: Float, scaleY: Float, width: Float, height: Float): Offset
+
+    fun Float.floatRange(radiusWithDistance: Float): ClosedFloatingPointRange<Float>
+
+    @Composable
+    fun Offset.findPointOnFigure(): Boolean
 
     fun addPointsToList(
         listPoints: SnapshotStateList<Offset>, figureLength: Int, scaleX: Float,
@@ -68,10 +77,12 @@ interface CustomSliderHandlerHelper {
             scaleY: Float, width: Float, height: Float,
             onTick: (Offset) -> Unit
         ) = with(listPoints) {
-            clear(); (0..figureLength).onEach { add(
-            it.sinusOffset(scaleX, scaleY, width, height)
-                .apply { onTick(this) }
-            ) }
+            clear(); (0..figureLength).onEach {
+            add(
+                it.sinusOffset(scaleX, scaleY, width, height)
+                    .apply { onTick(this) }
+            )
+        }
         }
 
         override fun DrawScope.draw(radius: Float, offset: Offset) =
@@ -80,22 +91,22 @@ interface CustomSliderHandlerHelper {
         @Composable
         override fun Float.Sinus(): Offset =
             with(composeDependencies.mainScreenDepsLocal()) {
-            Offset(
-                this@Sinus * scaleX + width, scaleY * sin(this@Sinus) + height
-            )
-        }
+                Offset(
+                    this@Sinus * scaleX + width, scaleY * sin(this@Sinus) + height
+                )
+            }
 
         @Composable
         override fun Float.Circle() = with(
             composeDependencies.mainScreenDepsLocal()
-        ){
+        ) {
             Offset(
                 scaleX * sin(this@Circle) + width, scaleX * cos(this@Circle) + height
             )
         }
 
         @Composable
-        override fun CompareOffsets() =
+        override fun IsFingerOnBall() =
             with(composeDependencies.mainScreenDepsLocal()) {
                 with(radius + distance) {
                     offset.x in eventOffset.x.minus(this)..eventOffset.x.plus(this)
@@ -105,10 +116,36 @@ interface CustomSliderHandlerHelper {
             }
 
         @Composable
+        override fun CompareOffsetsY() =
+            with(composeDependencies.mainScreenDepsLocal()) {
+                with(distance) {
+                    offset.x in eventOffset.x.floatRange(this)
+                            && offset.y in eventOffset.y.floatRange(this) && strike
+                }
+            }
+
+        override fun Float.floatRange(radiusWithDistance: Float) =
+            (minus(radiusWithDistance)..plus(radiusWithDistance))
+
+        @Composable
+        override fun Offset.findPointOnFigure(): Boolean {
+            with(composeDependencies.mainScreenDepsLocal()) {
+                listPoints.forEach {
+                    if (it.x in x.floatRange(distance) &&
+                        it.y in y.floatRange(distance)
+                    ) {
+                        return true
+                    }
+                }
+            }
+            return false
+        }
+
+        @Composable
         override fun CheckInList() =
             with(composeDependencies.mainScreenDepsLocal()) {
-            eventOffset.x in listPoints.first().x..listPoints.last().x
-        }
+                eventOffset.x in listPoints.first().x..listPoints.last().x
+            }
 
         @Composable
         override fun Float.SinusByEventX() =
@@ -124,7 +161,9 @@ interface CustomSliderHandlerHelper {
             composeDependencies.MainScreenDeps {
                 if (CheckInList()) {
                     when (figure) {
-                        Figures.SINUS -> { eventOffset.x.SinusByEventX().setOffset }
+                        Figures.SINUS -> {
+                            eventOffset.x.SinusByEventX().setOffset
+                        }
                         Figures.CIRCLE -> Unit
                     }
                 }

@@ -43,7 +43,7 @@ interface CustomSliderHandler {
             with(composeDependencies.mainScreenDepsLocal()) {
                 with(handlerUtils) {
                     if (strike) CheckInListAndGetSinusByEventX()
-                    if (!CompareOffsets() || action == 1) false.setStrike
+                    if (!eventOffset.findPointOnFigure() || action == 1) false.setStrike
                 }
             }
 
@@ -51,7 +51,8 @@ interface CustomSliderHandler {
         @Composable
         override fun BoxWithCanvas() =
             composeDependencies.MainScreenDeps {
-                Box(modifier = Modifier.fillMaxSize()
+                Box(modifier = Modifier
+                    .fillMaxSize()
                     .motionEventSpy { it.action.setAction; Offset(it.x, it.y).setEventOffset }
                 ) { DrawFigure() }
             }
@@ -68,7 +69,10 @@ interface CustomSliderHandler {
         @Composable
         override fun DrawBall() = with(handlerUtils) {
             composeDependencies.MainScreenDeps {
-                Box(Modifier.boxMod().pointerInput(Unit) {
+                Box(
+                    Modifier
+                        .boxMod()
+                        .pointerInput(Unit) {
                             detectTapGestures(onPress = { true.setStrike })
                         }
                 ) { Canvas(Modifier) { draw(radius, Offset(radius, radius)) } }
