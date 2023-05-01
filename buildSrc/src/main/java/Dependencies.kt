@@ -23,6 +23,7 @@ val implList = with(composeVersion) {
         "com.google.accompanist:accompanist-pager-indicators:0.24.1-alpha",
         "com.google.accompanist:accompanist-pager:0.24.1-alpha",
         "com.google.accompanist:accompanist-navigation-animation:0.24.1-alpha",
+        "io.coil-kt:coil-compose:2.3.0"
         // "com.squareup.leakcanary:leakcanary-android:2.9.1"
 
         // "androidx.room:room-runtime:2.4.2",

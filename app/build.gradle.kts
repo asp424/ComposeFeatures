@@ -6,11 +6,11 @@ plugins {
 dependencies {
 	implementations()
 	implementation(project(":expandedcolumn"))
-	implementation(files("libs/fantasticprogress-release.aar"))
+	//implementation(files("libs/fantasticprogress-release.aar"))
 }
 
 android {
-	compileSdk = 32
+	compileSdk = 33
 	defaultConfig {
 		applicationId = appId
 		minSdk = 26

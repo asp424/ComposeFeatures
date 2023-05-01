@@ -11,3 +11,4 @@ include ':Web'
 
 include ':expandedcolumn'
 include ':fantasticprogress'
+include ':app:pager'
